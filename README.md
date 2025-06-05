@@ -40,8 +40,8 @@ This plugin comes with a set of particular python generator scripts located in t
    * ``-g`` ``--generate-classes``: A list of class/enum definitions to generate. Use "all" to generate all classes (Default).
    * ``-a`` ``--static-assert``: Generate static assertions of resulting class/enum definitions to ensure their validity.
    * ``-d`` ``--supply-hl2sdk``: Supplies hl2sdk class/enum definitions if applicable to the generated file.
-    > [!NOTE]
-    > Schema dumps with parent scope, might not generate correct code without supplying [hl2sdk](https://github.com/alliedmodders/hl2sdk) definitions!
+> [!NOTE]
+> Schema dumps with parent scope, might not generate correct code without supplying [hl2sdk](https://github.com/alliedmodders/hl2sdk) definitions!
     
  * ``generate_cpp_defs.py``: Example script to generate [s2ze](https://github.com/Source2ZE/CS2Fixes) compatible class definitions out of dumped schema.
 
@@ -51,8 +51,8 @@ This plugin comes with a set of particular python generator scripts located in t
    * ``-s`` ``--silent``: Disables stdout output.
    * ``-c`` ``--comments``: Generate help comments for resulting class/enum definitions.
    * ``-g`` ``--generate-classes``: A list of class/enum definitions to generate. Doesn't default to "all" and expects you to provide classes to generate.
-    > [!NOTE]
-    > This script is mostly an example of how you can automate dumping schema to macro headers for plugins that use [s2ze](https://github.com/Source2ZE/CS2Fixes) alike schema systems.
+> [!NOTE]
+> This script is mostly an example of how you can automate dumping schema to macro headers for plugins that use [s2ze](https://github.com/Source2ZE/CS2Fixes) alike schema systems.
 
  * ``generate_pulse_bindings.py``: Generates source2 pulse bindings. Mostly for reference use. Requires pulse bindings to be dumped first in resulting dump.
 
@@ -76,8 +76,8 @@ This plugin comes with a set of particular python generator scripts located in t
    * ``MMSOURCE20``/``MMSOURCE_DEV`` should point to root of [metamod-source](https://www.metamodsource.net/downloads.php?branch=dev) of the version 2.0 and higher;
    * ``HL2SDKROOT`` should point to root folder where [hl2sdk](https://github.com/alliedmodders/hl2sdk) directories are in;
    * Alternatively ``HL2SDK{GAME}`` (e.g. ``HL2SDKCS2``) can be used to point to game specific [hl2sdk](https://github.com/alliedmodders/hl2sdk) directories, in which case a direct path to its root needs to be provided;
-      > [!NOTE]
-      > If you have ``HL2SDKROOT`` defined as well, it will take priority over this!
+> [!NOTE]
+> If you have ``HL2SDKROOT`` defined as well, it will take priority over this!
    * ``HL2SDKMANIFESTS`` should point to [hl2sdk-manifests](https://github.com/alliedmodders/hl2sdk-manifests) directory.
  * ``mkdir build`` & ``cd build`` in the root of the plugin folder.
  * Open the [MSVC developer console](https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line) with the correct platform (x86_64).
