@@ -1,0 +1,11 @@
+{
+    "name": "schemadump",
+    "alias": "sd",
+    "display_name": "Schema Dump",
+    "description": "Source2 Schema Dumper",
+    "author": "GAMMACASE",
+    "url": "https://github.com/GAMMACASE/Source2SchemaDumper",
+    "log_tag": "SCHEMADUMP",
+    "license": "MIT",
+    "version": "1.0.0.{{git-shorthash}}"
+}
