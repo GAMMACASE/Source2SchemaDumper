@@ -1,0 +1,115 @@
+name: Continuous Integration
+on: 
+  push:
+    branches:
+      - master
+      - ci-test
+    paths-ignore:
+      - generator_scripts/**
+      - README.md
+      - LICENSE
+      - .gitignore
+  pull_request:
+    branches:
+      - master
+      - ci-test
+    paths-ignore:
+      - generator_scripts/**
+      - README.md
+      - LICENSE
+      - .gitignore
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            os_short: windows
+            compiler_cc: msvc-vs2022
+            sdks: '["cs2", "dota", "deadlock"]'
+          - os: ubuntu-latest
+            os_short: linux
+            compiler_cc: clang
+            compiler_cxx: clang++
+            sdks: '["cs2", "dota"]'
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
+    name: ${{ matrix.os_short }}-${{ matrix.compiler_cc }}
+    env:
+      HL2SDKROOT: ${{ github.workspace }}/
+      HL2SDKMANIFESTS: ${{ github.workspace }}/hl2sdk-manifests/
+      MMSOURCE20: ${{ github.workspace }}/metamod-source/
+    steps:
+      - name: Checkout SchemaDump
+        uses: actions/checkout@v4
+        with:
+          path: schemadump
+      
+      - name: Checkout Metamod-Source
+        uses: actions/checkout@v4
+        with:
+          repository: alliedmodders/metamod-source
+          submodules: recursive
+          path: metamod-source
+
+      - name: Checkout hl2sdk-manifests
+        uses: actions/checkout@v4
+        with:
+          repository: alliedmodders/hl2sdk-manifests
+          path: hl2sdk-manifests
+
+      - name: Checkout hl2sdk-cs2
+        uses: actions/checkout@v4
+        with:
+          repository: alliedmodders/hl2sdk
+          path: hl2sdk-cs2
+          ref: cs2
+
+      - name: Checkout hl2sdk-dota
+        uses: actions/checkout@v4
+        with:
+          repository: alliedmodders/hl2sdk
+          path: hl2sdk-dota
+          ref: dota
+
+      - name: Checkout hl2sdk-deadlock
+        uses: actions/checkout@v4
+        with:
+          repository: alliedmodders/hl2sdk
+          path: hl2sdk-deadlock
+          ref: deadlock
+
+      - name: Checkout AMBuild
+        uses: actions/checkout@v4
+        with:
+          repository: alliedmodders/ambuild
+          path: ambuild
+
+      - name: Install AMBuild
+        run: |
+          cd ambuild && python setup.py install && cd ..
+
+      - name: Install Clang 16
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          apt update && apt install -y clang-16
+          echo "CC=${{ matrix.compiler_cc }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.compiler_cxx }}" >> $GITHUB_ENV
+          ${{ matrix.compiler_cc }} --version
+          ${{ matrix.compiler_cxx }} --version
+
+      - name: Build
+        working-directory: schemadump
+        run: |
+          mkdir build
+          cd build
+          python ../configure.py --enable-optimize --sdks=${{ join(fromJSON(matrix.sdks)) }}
+          ambuild
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: schemadump-${{ matrix.os_short }}
+          path: schemadump/build/package

@@ -1,0 +1,35 @@
+name: Publish release
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Release
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Package
+        run: |
+          version=`echo $GITHUB_REF | sed "s/refs\/tags\///"`
+          oses="linux windows"
+          sdks="cs2 dota deadlock"
+          for os in $oses; do
+              for sdk in $sdks; do
+                  if [ -d "./schemadump-$os/$sdk" ]; then
+                      echo "Packaging $os-$sdk..."
+                      cd ./schemadump-$os/$sdk
+                      zip -r ../../schemadump-$sdk-$os-${version}.zip ./*
+                      cd -
+                  fi
+              done
+          done
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            schemadump-*
