@@ -74,11 +74,11 @@ This plugin comes with a set of particular python generator scripts located in t
 ### Setting up
  * **(Optional)** Setup environment variables to point to correct directories:
    * ``MMSOURCE20``/``MMSOURCE_DEV`` should point to root of [metamod-source](https://www.metamodsource.net/downloads.php?branch=dev) of the version 2.0 and higher;
+   * ``HL2SDKMANIFESTS`` should point to [hl2sdk-manifests](https://github.com/alliedmodders/hl2sdk-manifests) directory.
    * ``HL2SDKROOT`` should point to root folder where [hl2sdk](https://github.com/alliedmodders/hl2sdk) directories are in;
    * Alternatively ``HL2SDK{GAME}`` (e.g. ``HL2SDKCS2``) can be used to point to game specific [hl2sdk](https://github.com/alliedmodders/hl2sdk) directories, in which case a direct path to its root needs to be provided;
 > [!NOTE]
-> If you have ``HL2SDKROOT`` defined as well, it will take priority over this!
-   * ``HL2SDKMANIFESTS`` should point to [hl2sdk-manifests](https://github.com/alliedmodders/hl2sdk-manifests) directory.
+> If you have ``HL2SDKROOT`` defined as well, it will take priority over game specific environment variables!
  * ``mkdir build`` & ``cd build`` in the root of the plugin folder.
  * Open the [MSVC developer console](https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line) with the correct platform (x86_64).
  * Run ``python3 ../configure.py --enable-optimize -s {GAMES}`` if you have setup env vars or provide correct paths via ``--hl2sdk-root``, ``--hl2sdk-manifests`` and ``--mms_path`` args (``{GAMES}`` should be comma separated list of names like ``cs2,dota,deadlock``).
