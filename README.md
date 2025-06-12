@@ -63,6 +63,86 @@ This plugin comes with a set of particular python generator scripts located in t
    * ``-n`` ``--no-comments``: Don't generate help comments for resulting domain definitions.
    * ``-g`` ``--generate-domains``: A list of domain definitions to generate. Use "all" to generate all domains (Default).
 
+## IDAClang usage example
+
+One of the main advantages of this plugin and its scripts is that it allows for a full idaclang compilation support! But it requires a small setup beforehand if you are new to idaclang and only starting to setting up, some key notes to know:
+ * This guide was written with windows in mind, it should be possible to do the same for linux binaries, but be aware that schema differs per platform, so you'd need a linux dump first, as well as some corrections to compile arguments!
+ * Only versions of ida 7.7 and above are supported, as that was the first version where idaclang was introduced;
+ * Make sure compiler used by ida is clang, ``Options->Compiler`` locate ``Source parser``, should be set to ``clang``. To parse c++ file, use ``File->Load file->Parse C header file``;
+ * Compile arguments:
+   * Target platform, make sure you are targetting correct platform (example: ``-target x86_64-pc-windows-msvc19.16.27045``);
+   * C++ version, 17 and above should be supported, but was tested on c++17 (example: ``-std=c++17``);
+   * Some hl2sdk code expects certain defines set, notably: ``X64BITS``, ``PLATFORM_64BITS`` (example: ``-DX64BITS -DPLATFORM_64BITS``);
+   * There are few other handy defines and arguments I'd suggest using (especially for hl2sdk support), so here's the complete argument string for reference that was used during test (ida 7.7 but should work for further versions as well):
+      ```
+      -x c++ -std=c++17 -Wno-c++11-narrowing -target x86_64-pc-windows-msvc19.16.27045 -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_GLIBCXX_DEBUG=0 -D_ITERATOR_DEBUG_LEVEL=0 -DDEBUG -D_DEBUG -DWIN32 -D_WINDOWS -DCOMPILER_MSVC -DCOMPILER_MSVC64 -DX64BITS -DPLATFORM_64BITS -D_WIN32=1 -D_MSC_VER=1900 -D__clang__ -D__clang_major__=17 -D_CRT_USE_BUILTIN_OFFSETOF=1
+      ```
+ * Include paths:
+   * Generally for non-hl2sdk build you should be fine with whatever idaclang has already, but if you want to have hl2sdk to build correctly, here's the paths list you need to have for it to locate everything correctly:
+     * ``{HL2SDKPATH}\public``
+     * ``{HL2SDKPATH}\game\shared``
+     * ``{HL2SDKPATH}\game\server``
+     * ``{HL2SDKPATH}\public\tier0``
+     * ``{HL2SDKPATH}\public\tier1``
+     * ``{HL2SDKPATH}\public\mathlib``
+     * ``{HL2SDKPATH}\public\entity2``
+     * ``{HL2SDKPATH}\public\engine``
+     * ``{HL2SDKPATH}\public\game\server``
+     * ``{HL2SDKPATH}\thirdparty\protobuf-3.21.8\src``
+     * ``{HL2SDKPATH}\common``
+     * Replace ``{HL2SDKPATH}`` with an absolute path to hl2sdk for a game you are targetting (like ``hl2sdk-cs2``);
+ * If you want to preserve arguments and include paths between binaries, you can edit ``{IDAPATH}/cfg/idaclang.cfg`` in there edit ``CLANG_ARGV``, where include directories could be supplied with ``-I`` argument (example ``-ID:\\hl2sdk-cs2\\public``);
+
+### Some gotchas & ABI differences
+
+Since idaclang uses clang under the hood to compile c++, it would mismatch on some stuff with MSVC, you can see what is supported [here](https://clang.llvm.org/docs/MSVCCompatibility.html). But here's the general gist of what you'd most likely encounter:
+ * [Member function pointers](https://isocpp.org/wiki/faq/pointers-to-members) are of a different size (16 on clang, 8 on MSVC) which would produce different sized structs. That's not used in schema, but is used in hl2sdk if you plan on not only limiting with schema (Notable cases in hl2sdk: ``CUtlDelegate``, ``CUtlBuffer``);
+ * Inlined structs/classes of templated classes might not be picked up correctly by idaclang and might be missing, example:
+    ```cpp
+    template <typename T>
+    class TemplateTest
+    {
+        struct SubStruct
+        {
+            T m_Val;
+        };
+        
+        SubStruct *m_Dummy;
+    };
+
+    TemplateTest<int> testvar;
+    ```
+    in this example, ``TemplateTest<int>::SubStruct`` would be only be declared but not defined in ida's type database, producing incomplete results. There's no global fix for this (if you know any lmk!!!), you can only fix it locally per template instance by providing [explicit template specialization](https://en.cppreference.com/w/cpp/language/template_specialization.html) of said type which would compile everything there's for it, example fix for the above case would be adding this before any usages of said template specialization:
+    ```cpp
+    template class TemplateTest<int>;
+    ```
+    Example hl2sdk code that is affected by this: ``CUtlLinkedList`` and its variations;
+
+### CUtlDelegate compilation issues
+
+That's not part of this plugin scope, as nothing in schema uses it, but I'll anyway provide a "fix" for this case for anyone who might wonder how to deal with errors such as ``fatal: failed to forward declare type: name="utldelegate::SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + sizeof(int)>" code=-3`` and alike, put this cpp code before any hl2sdk header files:
+```cpp
+// Hack fix as clang compiles member function pointers to 16 bytes and msvc uses 8,
+// so this struct ends up +8 bytes longer than msvc produces
+#define UTLDELEGATE_H
+template <typename Signature>
+class CUtlDelegate;
+
+template<typename R>
+class CUtlDelegate< R( ) > { char pad[16]; };
+template<typename R, class p1>
+class CUtlDelegate< R( p1 ) > { char pad[16]; };
+template<typename R, class p1, class p2>
+class CUtlDelegate< R( p1, p2 ) > { char pad[16]; };
+template<typename R, class p1, class p2, class p3>
+class CUtlDelegate< R( p1, p2, p3 ) > { char pad[16]; };
+template<typename R, class p1, class p2, class p3, class p4>
+class CUtlDelegate< R( p1, p2, p3, p4 ) > { char pad[16]; };
+template<typename R, class p1, class p2, class p3, class p4, class p5>
+class CUtlDelegate< R( p1, p2, p3, p4, p5 ) > { char pad[16]; };
+class CUtlAbstractDelegate { char pad[16]; };
+```
+
 ## Manual building example
 
 ### Prerequisites
