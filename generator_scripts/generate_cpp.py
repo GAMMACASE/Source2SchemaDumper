@@ -459,7 +459,7 @@ def main():
 	global args
 
 	parser = argparse.ArgumentParser(
-		description = "Generates source2 schema definitions for C++ out of dumped schema data.",
+		description = "Generates C++ source2 schema definitions out of dumped schema data.",
 		usage = "%(prog)s [options]"
 	)
 

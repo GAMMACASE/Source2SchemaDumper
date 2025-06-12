@@ -3,6 +3,10 @@ from typing import Union
 
 from generator_scripts.common import align_value
 
+alignment_overrides = {
+	'EngineLoopState_t': 8
+}
+
 class SubTypeTypes(str, Enum):
 	NONE = 'none'
 	REF = 'ref'
@@ -495,6 +499,7 @@ class ObjectDefinition:
 		return self.traits.has_flag(flag)
 
 	def calc_alignment(self):
+		global alignment_overrides
 		if self.get_packed_alignment() != -1:
 			return -1
 
@@ -506,6 +511,9 @@ class ObjectDefinition:
 		
 		if self.calculated_alignment != -1:
 			return self.calculated_alignment
+
+		if self.name in alignment_overrides:
+			return alignment_overrides[self.name]
 
 		parent_alignment = self.calc_parent_alignment()
 		has_virtuals = self.has_flag('has_virtual_members')

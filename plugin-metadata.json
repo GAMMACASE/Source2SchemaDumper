@@ -7,5 +7,5 @@
     "url": "https://github.com/GAMMACASE/Source2SchemaDumper",
     "log_tag": "SCHEMADUMP",
     "license": "MIT",
-    "version": "1.0.0.{{git-shorthash}}"
+    "version": "1.0.1.{{git-shorthash}}"
 }
