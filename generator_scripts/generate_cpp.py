@@ -22,10 +22,8 @@ class CppWriter(FileWriter):
 	def class_definition(self, class_obj: ObjectDefinition):
 		current_offset = 0
 		for (baseclass, offset) in class_obj.get_baseclasses():
-			current_offset += baseclass.size
+			current_offset += align_value(baseclass.size, baseclass.calc_parent_alignment())
 		
-		current_offset = align_value(current_offset, class_obj.calc_parent_alignment())
-
 		has_virtuals = class_obj.has_flag('has_virtual_members')
 		class_alignment = class_obj.calc_alignment()
 
@@ -49,6 +47,7 @@ class CppWriter(FileWriter):
 
 		bitfield_accum = 0
 		previous_member_alignment = 0
+
 		for member in class_obj.get_members():
 			member_size = member.get_type().get_size()
 			member_alignment = member.get_type().get_alignment()
