@@ -173,6 +173,8 @@ class CUtlAbstractDelegate { char pad[16]; };
  * Solutions would be created in ``./build`` subdirectory separately for each supported game.
 
 ## KV3/JSON Dump structure
+ * ``game_info``: A copy of ``steam.inf`` at the moment of dump which provides some context on what game version was used during dumping process. (Could be missing if dumper failed to locate/read ``steam.inf``!)
+ * ``dumper_info``: Provides dumper related information that was used during the dumping process (``dump_date``, ``dump_format_version``, dumper ``version``).
  * ``dump_flags``: An array of flags that were used during dumping process.
  * ``defs``: Main entry point for all schema definitions, contains an array of objects having following structure:
    * ``type``: Object type (Could either be ``builtin``, ``class`` or ``enum``);
