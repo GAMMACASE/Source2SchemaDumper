@@ -265,7 +265,7 @@ const char *PLUGIN_REVISION_COUNT = \"{revision_count}\";
     """.encode('utf-8'))
 
     for cxx in self.all_targets:
-      lib = cxx.StaticLibrary('versionlib')
+      lib = cxx.StaticLibrary(f'versionlib_{cxx.target.arch}')
 	  
       self.configureCXX(lib.compiler)
 	  
