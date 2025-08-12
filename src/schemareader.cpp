@@ -4,9 +4,6 @@
 
 #include "plugin.h"
 
-#include "memblockallocator.h"
-#include "commonmacros.h"
-
 CSchemaSystem *SchemaReader::SchemaSystem()
 {
 	static CSchemaSystem *s_SchemaSystem = nullptr;
@@ -567,10 +564,6 @@ inline void SchemaReader::ReadPulseDomains( KeyValues3 *root, std::map<std::stri
 			{
 				if(auto binding = meta_binding->Value())
 				{
-#if SOURCE_ENGINE != SE_CS2
-					// META_CONPRINTF( "BINDING VAL: %s %d | funcv2: %d (funcsv1: %d)\n", binding->m_Name.Get(), binding->m_unk001, binding->m_FunctionV2Count, binding->m_FunctionCount );
-#endif
-
 					auto iter = domains.find( binding->m_Name.Get() );
 					KeyValues3 *domain;
 
@@ -610,9 +603,7 @@ inline void SchemaReader::ReadPulseDomains( KeyValues3 *root, std::map<std::stri
 					}
 
 					ReadPulseDomianFunctions( functions, binding->m_Functions, binding->m_FunctionCount );
-#if SOURCE_ENGINE != SE_CS2
 					ReadPulseDomianFunctions( functions, binding->m_EventFunctions, binding->m_EventFunctionCount );
-#endif
 				}
 			}
 		}

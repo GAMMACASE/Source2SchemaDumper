@@ -4,34 +4,52 @@
 
 #include <sstream>
 
+struct SoundEvent_t
+{
+	uint64 m_unk001;
+	CUtlString m_SoundName;
+};
+
 struct SchemaMetadataEntryData_t;
 
-#if SOURCE_ENGINE == SE_CS2
+#if SOURCE_ENGINE != SE_DEADLOCK
 enum PulseValueType_t : int32
 {
 	PVAL_INVALID = -1,
+	PVAL_VOID = -1,
 	PVAL_BOOL = 0,
 	PVAL_INT = 1,
 	PVAL_FLOAT = 2,
 	PVAL_STRING = 3,
-	PVAL_VEC3 = 4,
-	PVAL_TRANSFORM = 5,
-	PVAL_COLOR_RGB = 6,
-	PVAL_EHANDLE = 7,
-	PVAL_RESOURCE = 8,
-	PVAL_SNDEVT_GUID = 9,
-	PVAL_SNDEVT_NAME = 10,
-	PVAL_ENTITY_NAME = 11,
-	PVAL_OPAQUE_HANDLE = 12,
-	PVAL_TYPESAFE_INT = 13,
-	PVAL_CURSOR_FLOW = 14,
-	PVAL_ANY = 15,
-	PVAL_SCHEMA_ENUM = 16,
-	PVAL_PANORAMA_PANEL_HANDLE = 17,
-	PVAL_TEST_HANDLE = 18,
-	PVAL_COUNT = 19,
+	PVAL_VEC2 = 4,
+	PVAL_VEC3 = 5,
+	PVAL_QANGLE = 6,
+	PVAL_VEC3_WORLDSPACE = 7,
+	PVAL_VEC4 = 8,
+	PVAL_TRANSFORM = 9,
+	PVAL_TRANSFORM_WORLDSPACE = 10,
+	PVAL_COLOR_RGB = 11,
+	PVAL_GAMETIME = 12,
+	PVAL_EHANDLE = 13,
+	PVAL_RESOURCE = 14,
+	PVAL_RESOURCE_NAME = 15,
+	PVAL_SNDEVT_GUID = 16,
+	PVAL_SNDEVT_NAME = 17,
+	PVAL_ENTITY_NAME = 18,
+	PVAL_OPAQUE_HANDLE = 19,
+	PVAL_TYPESAFE_INT = 20,
+	PVAL_MODEL_MATERIAL_GROUP = 21,
+	PVAL_CURSOR_FLOW = 22,
+	PVAL_VARIANT = 23,
+	PVAL_UNKNOWN = 24,
+	PVAL_SCHEMA_ENUM = 25,
+	PVAL_PANORAMA_PANEL_HANDLE = 26,
+	PVAL_TEST_HANDLE = 27,
+	PVAL_ARRAY = 28,
+	PVAL_TYPESAFE_INT64 = 29,
+	PVAL_COUNT = 30,
 };
-#elif SOURCE_ENGINE != SE_CS2
+#elif SOURCE_ENGINE == SE_DEADLOCK
 enum PulseValueType_t : int32
 {
 	PVAL_INVALID = -1,
@@ -73,7 +91,6 @@ struct PulseParamType
 
 		switch(m_Type)
 		{
-#if SOURCE_ENGINE != SE_CS2
 			case PVAL_ARRAY:
 			{
 				if(m_SubType && m_SubType->IsValid())
@@ -92,16 +109,19 @@ struct PulseParamType
 			case PVAL_VEC3_WORLDSPACE: ss << "vec3_world"; break;
 			case PVAL_TRANSFORM_WORLDSPACE:	ss << "transform_world"; break;
 			case PVAL_GAMETIME:		ss << "game_time"; break;
-#endif
 
 			case PVAL_BOOL:			ss << "bool"; break;
 			case PVAL_INT:			ss << "int"; break;
 			case PVAL_FLOAT:		ss << "float"; break;
 			case PVAL_STRING:		ss << "string"; break;
-			case PVAL_VEC3:			ss << "vec3"; break;
-#if SOURCE_ENGINE != SE_CS2
-			case PVAL_QANGLE:		ss << "qangle"; break;
+
+#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
+			case PVAL_VEC2:			ss << "vec2"; break;
+			case PVAL_VEC4:			ss << "vec4"; break;
 #endif
+
+			case PVAL_VEC3:			ss << "vec3"; break;
+			case PVAL_QANGLE:		ss << "qangle"; break;
 			case PVAL_TRANSFORM:	ss << "transform"; break;
 			case PVAL_COLOR_RGB:	ss << "color"; break;
 			case PVAL_EHANDLE:		ss << "ehandle<" << (m_LibraryClass ? m_LibraryClass : "" ) << ">"; break;
@@ -112,7 +132,12 @@ struct PulseParamType
 			case PVAL_OPAQUE_HANDLE:ss << (m_LibraryClass ? m_LibraryClass : "schema" ) << "*"; break;
 			case PVAL_TYPESAFE_INT:	ss << (m_LibraryClass ? m_LibraryClass : "!int"); break;
 			case PVAL_CURSOR_FLOW:	ss << "cursor"; break;
+#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
+			case PVAL_VARIANT:		ss << "variant"; break;
+			case PVAL_UNKNOWN:		ss << "unknown"; break;
+#else
 			case PVAL_ANY:			ss << "any"; break;
+#endif
 			case PVAL_SCHEMA_ENUM:	ss << "enum {" << m_LibraryClass << "}"; break;
 			case PVAL_PANORAMA_PANEL_HANDLE: ss << "panorama_panel_handle"; break;
 			case PVAL_TEST_HANDLE:	ss << "testhandle<" << (m_LibraryClass ? m_LibraryClass : "") << ">"; break;
@@ -143,26 +168,13 @@ struct PulseParamType
 				META_CONPRINTF( "Found valid library class (%s) field for type (%d).\n", m_LibraryClass, m_Type );
 			}
 		}
-
-#if SOURCE_ENGINE == SE_CS2
-		if(m_IsArray)
-		{
-			ss << "[]";
-		}
-#endif
 		
 		return ss.str();
 	}
 
-#if SOURCE_ENGINE == SE_CS2
-	bool m_IsArray;
-	PulseValueType_t m_Type;
-	const char *m_LibraryClass;
-#else
 	PulseValueType_t m_Type;
 	PulseParamType *m_SubType;
 	const char *m_LibraryClass;
-#endif
 };
 
 class CPulseFunctionParam
@@ -186,7 +198,13 @@ public:
 			case PVAL_FLOAT:		return std::to_string( DefaultValue<float>() );
 			case PVAL_STRING:		return DefaultValue<CUtlString>().Get();
 			case PVAL_SCHEMA_ENUM:	return std::to_string( DefaultValue<int64>() );
+#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
+			case PVAL_VARIANT:		return std::to_string( *DefaultValue<int64 *>() );
+			case PVAL_EHANDLE:		return std::to_string( DefaultValue<int32>() );
+			case PVAL_SNDEVT_NAME:	return std::string( "\"" ) + DefaultValue<SoundEvent_t *>()->m_SoundName.Get() + "\"";
+#else
 			case PVAL_ANY:			return std::to_string( *DefaultValue<int64 *>() );
+#endif
 
 			case PVAL_VEC3:
 			{
@@ -214,23 +232,6 @@ public:
 		}
 	}
 
-#if SOURCE_ENGINE == SE_CS2
-public:
-	CKV3MemberName m_Name;
-
-	PulseParamType m_TypeDesc;
-
-	void *m_DefaultValue;
-	PulseParamType m_DefaultValueTypeDesc;
-
-private:
-	void *m_unk003;
-
-public:
-	uint16 m_StaticMetadataCount;
-	SchemaMetadataEntryData_t *m_StaticMetadata;
-
-#else
 public:
 	CKV3MemberName m_Name;
 
@@ -250,7 +251,6 @@ public:
 
 private:
 	void *m_unk005;
-#endif
 };
 
 class CPulseDomainFunction
@@ -290,9 +290,11 @@ public:
 class CPulseLibraryBinding
 {
 public:
+#if SOURCE_ENGINE == SE_DOTA
+	void *m_unk001;
+#endif
 	CUtlString m_Name;
 
-#if SOURCE_ENGINE == SE_DOTA || SOURCE_ENGINE == SE_DEADLOCK
 	int m_Flags;
 
 	int m_FunctionCount;
@@ -300,18 +302,14 @@ public:
 
 	int m_EventFunctionCount;
 	CPulseLibraryEventFunction *m_EventFunctions;
-#else
-
-	CUtlString m_Description;
-
-	int m_FunctionCount;
-	CPulseLibraryFunction *m_Functions;
-#endif
 };
 
 class CPulseDomainInfo
 {
 public:
+#if SOURCE_ENGINE == SE_DOTA
+	void *m_unk001;
+#endif
 	CUtlString m_Name;
 	CUtlString m_FriendlyName;
 	CUtlString m_Description;
@@ -366,6 +364,8 @@ METADATA_TAG( MPulseCellMethodBindings, CPulseLibraryBinding * );
 METADATA_TAG( MPulseInstanceDomainInfo, CPulseDomainInfo * );
 METADATA_TAG( MPulseDomainHookInfo, CPulseHookInfo * );
 METADATA_TAG( MPulseCellOutflowHookInfo, CPulseHookInfo * );
+METADATA_TAG( MPulseTypeQueriesForScopeSingleton, void * );
+METADATA_TAG( MPulseCell_WithNoDefaultOutflow, empty_t );
 
 METADATA_TAG( MSourceTSDomain, empty_t );
 METADATA_TAG( MCellForDomain, const char * );
@@ -377,13 +377,9 @@ METADATA_TAG( MPulseRequirementCommit, empty_t );
 METADATA_TAG( MPulseRequirementCheck, empty_t );
 METADATA_TAG( MPulseDomainOptInValueType, int );
 
-#if SOURCE_ENGINE == SE_CS2
-METADATA_TAG( MPulseProvideFeatureTag, const char * );
-METADATA_TAG( MPulseDomainOptInFeatureTag, const char * );
-#else
 METADATA_TAG( MPulseProvideFeatureTag, int );
 METADATA_TAG( MPulseDomainOptInFeatureTag, int );
-#endif
+METADATA_TAG( MPulseDomainOptInVariableKeysSource, int64 * );
 
 METADATA_TAG( MPulseEditorIsControlFlowNode, empty_t );
 METADATA_TAG( MPulseEditorHeaderIcon, const char * );
@@ -392,6 +388,8 @@ METADATA_TAG( MPulseEditorHeaderExpr, const char * );
 METADATA_TAG( MPulseEditorSubHeaderText, const char * );
 METADATA_TAG( MPulseEditorCanvasItemPreset, const char * );
 METADATA_TAG( MPulseEditorCanvasItemSpecKV3, const char * );
+METADATA_TAG( MPulseSelectorAllowRequirementCriteria, const char * );
+METADATA_TAG( MPulseSelectorHasSpecificity, empty_t );
 METADATA_TAG( MPulseExpressionAlias, const char * );
 METADATA_TAG( MPulseCellWithCustomDocNode, empty_t );
 METADATA_TAG( MPulseCellOutflow_IsDefault, empty_t );
@@ -406,7 +404,9 @@ METADATA_TAG( MPulseInstanceFunction, const char * );
 METADATA_TAG( MPulseInstanceStep, const char * );
 METADATA_TAG( MPulseLibraryFunction, const char * );
 METADATA_TAG( MPulseLibraryStep, const char * );
+METADATA_TAG( MPulseDomainScopeInfo, int * );
 METADATA_TAG( MPulseDomainHiddenInTool, empty_t );
+METADATA_TAG( MPulseDomainDebuggerCanCreateInstance, empty_t );
 METADATA_TAG( MPulseDomainOptInGameBlackboard, const char * );
 METADATA_TAG( MPulseDomainIsGameBlackboard, empty_t );
 METADATA_TAG( MPulseFunctionHiddenInTool, empty_t );

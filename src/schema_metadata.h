@@ -90,6 +90,14 @@ struct CSchemaSendProxyRecipientsFilter
 	int m_FilterIndex;
 };
 
+#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
+struct ClassKV3Defaults
+{
+	KeyValues3 *m_Defaults;
+	KeyValues3 *m_unk001;
+};
+#endif
+
 class KeyValues3;
 class IGapTypeQueryRegistrationForScope;
 
@@ -99,7 +107,11 @@ using FnPropertyAttrExtraInfo = CUtlString (*)(CUtlString &, void *);
 using FnPropertyElementName = void (*)(void *, CUtlString &);
 using FnParticleCustomFieldDefaultValue = bool (*)(KeyValues3 *, KeyValues3 *);
 using FnLeafSuggestionProvider = void (*)(void *);
+#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
+using FnGetKV3Defaults = ClassKV3Defaults *(*)();
+#else
 using FnGetKV3Defaults = KeyValues3 *(*)();
+#endif
 
 template <typename T>
 struct SchemaMetadataField : public SchemaMetadataEntryData_t
@@ -154,10 +166,10 @@ template<> inline std::string SchemaMetadataField<CSchemaNetworkOverride>::ToStr
 template<> inline std::string SchemaMetadataField<FnGetKV3Defaults>::ToString() const
 {
 #if SOURCE_ENGINE == SE_CS2
-	if(!Value())
+	if(!Value() || !Value()())
 		return "";
 
-	KeyValues3 *kv = Value()();
+	KeyValues3 *kv = Value()()->m_Defaults;
 	if(!kv)
 		return "";
 
@@ -258,6 +270,7 @@ METADATA_TAG( MNetworkVarsAtomic, empty_t );
 METADATA_TAG( MNetworkEnable, empty_t );
 METADATA_TAG( MNetworkDisable, empty_t );
 METADATA_TAG( MNetworkPolymorphic, empty_t );
+METADATA_TAG( MNetworkOutOfPVSUpdates, int * );
 METADATA_TAG( MNetworkChangeAccessorFieldPathIndex, empty_t );
 
 METADATA_TAG( MResourceTypeForInfoType, const char[8] );
@@ -276,6 +289,7 @@ METADATA_TAG( MPropertyArrayElementNameKey, const char * );
 METADATA_TAG( MPropertyCustomFGDType, const char * );
 METADATA_TAG( MPropertySuppressBaseClassField, const char * );
 METADATA_TAG( MPropertyAttributeSuggestionName, const char * );
+METADATA_TAG( MPropertyProvidesEditContextString, const char * );
 METADATA_TAG( MPropertyCustomEditor, const char * );
 METADATA_TAG( MPropertyEditClassAsString, CSchemaPropertyEditClassAsString );
 METADATA_TAG( MPropertyAttrChangeCallback, FnPropertyAttrChangeCb );
@@ -286,6 +300,7 @@ METADATA_TAG( MPropertyLeafSuggestionProviderFn, FnLeafSuggestionProvider );
 METADATA_TAG( MPropertySuppressEnumerator, empty_t );
 METADATA_TAG( MPropertyFlattenIntoParentRow, empty_t );
 METADATA_TAG( MPropertyAutoRebuildOnChange, empty_t );
+METADATA_TAG( MPropertyPolymorphicClass, empty_t );
 METADATA_TAG( MPropertyAutoExpandSelf, empty_t );
 METADATA_TAG( MPropertyColorPlusAlpha, empty_t );
 METADATA_TAG( MPropertySuppressField, empty_t );
@@ -337,3 +352,5 @@ METADATA_TAG( MParticleReplacementOp, const char * );
 METADATA_TAG( MParticleMinVersion, int );
 METADATA_TAG( MParticleMaxVersion, int );
 METADATA_TAG( MParticleDomainTag, const char * );
+
+METADATA_TAG( M_LEGACY_OptInToSchemaPropertyDomain, empty_t );
