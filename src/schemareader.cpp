@@ -396,45 +396,56 @@ int SchemaReader::ReadDeclClass( CSchemaType_DeclaredClass *type )
 	LinkChildParentScopeDecls( traits, type, idx );
 	ReadFlags( traits, type );
 
-	// Ugly hack to prevent stringifying corrupted kv3 getter in that class,
-	// otherwise it'll crash when attempted to be retrieved
-	if(std::strcmp( ci->m_pszName, "CastSphereSATParams_t" ) != 0)
-		ReadMetaTags( traits, ci->m_pStaticMetadata, ci->m_nStaticMetadataCount );
-
-	if(ci->m_nBaseClassCount > 0)
+	if(ci)
 	{
-		traits->SetMemberUShort( "multi_depth", ci->m_nMultipleInheritanceDepth );
-		traits->SetMemberUShort( "single_depth", ci->m_nSingleInheritanceDepth );
+		// Ugly hack to prevent stringifying corrupted kv3 getter in that class,
+		// otherwise it'll crash when attempted to be retrieved
+		if(std::strcmp( ci->m_pszName, "CastSphereSATParams_t" ) != 0)
+			ReadMetaTags( traits, ci->m_pStaticMetadata, ci->m_nStaticMetadataCount );
 
-		auto baseclasses = traits->FindOrCreateMember( "baseclasses" );
-		baseclasses->SetArrayElementCount( ci->m_nBaseClassCount );
-		
-		for(int i = 0; i < ci->m_nBaseClassCount; i++)
+		if(ci->m_nBaseClassCount > 0)
 		{
-			auto &base_ci = ci->m_pBaseClasses[i];
-			auto baseclass = baseclasses->GetArrayElement( i );
+			traits->SetMemberUShort( "multi_depth", ci->m_nMultipleInheritanceDepth );
+			traits->SetMemberUShort( "single_depth", ci->m_nSingleInheritanceDepth );
 
-			baseclass->SetMemberUInt( "offset", base_ci.m_nOffset );
-			baseclass->SetMemberInt( "ref_idx", ReadDeclClass( base_ci.m_pClass->m_pDeclaredClass ) );
+			auto baseclasses = traits->FindOrCreateMember( "baseclasses" );
+			baseclasses->SetArrayElementCount( ci->m_nBaseClassCount );
+
+			for(int i = 0; i < ci->m_nBaseClassCount; i++)
+			{
+				auto &base_ci = ci->m_pBaseClasses[i];
+				auto baseclass = baseclasses->GetArrayElement( i );
+
+				baseclass->SetMemberUInt( "offset", base_ci.m_nOffset );
+				baseclass->SetMemberInt( "ref_idx", ReadDeclClass( base_ci.m_pClass->m_pDeclaredClass ) );
+			}
 		}
 	}
 
 	ApplyNetVarOverrides( type );
 
 	auto members = traits->FindOrCreateMember( "members" );
-	members->SetArrayElementCount( ci->m_nFieldCount );
 
-	for(int i = 0; i < ci->m_nFieldCount; i++)
+	if(ci)
 	{
-		auto field = ci->m_pFields[i];
-		auto member = members->GetArrayElement( i );
+		members->SetArrayElementCount( ci->m_nFieldCount );
 
-		member->SetMemberString( "name", field.m_pszName );
-		member->SetMemberInt( "offset", field.m_nSingleInheritanceOffset );
-		auto member_traits = member->FindOrCreateMember( "traits" );
+		for(int i = 0; i < ci->m_nFieldCount; i++)
+		{
+			auto field = ci->m_pFields[i];
+			auto member = members->GetArrayElement( i );
 
-		ReadMetaTags( member_traits, field.m_pStaticMetadata, field.m_nStaticMetadataCount );
-		ReadMemberSchemaType( member_traits, field.m_pType );
+			member->SetMemberString( "name", field.m_pszName );
+			member->SetMemberInt( "offset", field.m_nSingleInheritanceOffset );
+			auto member_traits = member->FindOrCreateMember( "traits" );
+
+			ReadMetaTags( member_traits, field.m_pStaticMetadata, field.m_nStaticMetadataCount );
+			ReadMemberSchemaType( member_traits, field.m_pType );
+		}
+	}
+	else
+	{
+		members->SetArrayElementCount( 0 );
 	}
 
 	return idx;
@@ -451,20 +462,28 @@ int SchemaReader::ReadDeclEnum( CSchemaType_DeclaredEnum *type )
 	auto ci = type->m_pEnumInfo;
 
 	LinkChildParentScopeDecls( traits, type, idx );
-	ReadMetaTags( traits, ci->m_pStaticMetadata, ci->m_nStaticMetadataCount );
 	ReadFlags( traits, type );
 
-	auto fields = traits->FindOrCreateMember( "fields" );
-	fields->SetArrayElementCount( ci->m_nEnumeratorCount );
-	for(int i = 0; i < ci->m_nEnumeratorCount; i++)
+	if(ci)
 	{
-		auto enumf = ci->m_pEnumerators[i];
-		auto field = fields->GetArrayElement( i );
+		ReadMetaTags( traits, ci->m_pStaticMetadata, ci->m_nStaticMetadataCount );
 
-		field->SetMemberString( "name", enumf.m_pszName );
-		field->SetMemberInt64( "value", enumf.m_nValue );
-		
-		ReadMetaTags( field, enumf.m_pStaticMetadata, enumf.m_nStaticMetadataCount, true );
+		auto fields = traits->FindOrCreateMember( "fields" );
+		fields->SetArrayElementCount( ci->m_nEnumeratorCount );
+		for(int i = 0; i < ci->m_nEnumeratorCount; i++)
+		{
+			auto enumf = ci->m_pEnumerators[i];
+			auto field = fields->GetArrayElement( i );
+
+			field->SetMemberString( "name", enumf.m_pszName );
+			field->SetMemberInt64( "value", enumf.m_nValue );
+
+			ReadMetaTags( field, enumf.m_pStaticMetadata, enumf.m_nStaticMetadataCount, true );
+		}
+	}
+	else
+	{
+		traits->FindOrCreateMember( "fields" )->SetArrayElementCount( 0 );
 	}
 
 	return idx;
@@ -508,6 +527,9 @@ void SchemaReader::ReadFlags( KeyValues3 *root, CSchemaType *type )
 {
 	if(auto class_decl = type->ReinterpretAs<CSchemaType_DeclaredClass>())
 	{
+		if(!class_decl->m_pClassInfo)
+			return;
+
 		auto class_flags = class_decl->m_pClassInfo->m_nFlags1;
 
 		if(class_flags == 0)
@@ -562,6 +584,9 @@ void SchemaReader::ReadFlags( KeyValues3 *root, CSchemaType *type )
 	}
 	else if(auto enum_decl = type->ReinterpretAs<CSchemaType_DeclaredEnum>())
 	{
+		if(!enum_decl->m_pEnumInfo)
+			return;
+
 		auto enum_flags = enum_decl->m_pEnumInfo->m_nFlags;
 
 		if(enum_flags == 0)
@@ -799,7 +824,7 @@ bool SchemaReader::ApplyNetVarOverrides( CSchemaType_DeclaredClass *type )
 	
 	auto ci = type->m_pClassInfo;
 
-	if(ci->m_nBaseClassCount <= 0)
+	if(!ci || ci->m_nBaseClassCount <= 0)
 		return true;
 
 	for(auto &meta : SchemaMetadataIterator( ci->m_pStaticMetadata, ci->m_nStaticMetadataCount ))
@@ -840,6 +865,9 @@ bool SchemaReader::ApplyNetVarOverrides( CSchemaType_DeclaredClass *type )
 bool SchemaReader::ApplyNetVarOverrides( CSchemaType_DeclaredClass *root, const char *field_to_overwrite, int type_override_idx )
 {
 	auto ci = root->m_pClassInfo;
+
+	if(!ci)
+		return true;
 
 	for(int i = 0; i < ci->m_nFieldCount; i++)
 	{
