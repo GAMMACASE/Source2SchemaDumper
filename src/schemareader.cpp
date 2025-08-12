@@ -4,6 +4,10 @@
 
 #include "plugin.h"
 
+#include <fstream>
+#include <filesystem>
+#include <ctime>
+
 CSchemaSystem *SchemaReader::SchemaSystem()
 {
 	static CSchemaSystem *s_SchemaSystem = nullptr;
@@ -54,6 +58,51 @@ std::string SchemaReader::SplitTemplatedName( CSchemaType *type ) const
 	return name;
 }
 
+void SchemaReader::RecordGameInfo()
+{
+	std::ifstream inp( std::filesystem::path( g_SMAPI->GetBaseDir() ) / "steam.inf" );
+
+	if(inp.is_open())
+	{
+		auto game_info = GetRoot()->FindOrCreateMember( "game_info" );
+
+		std::string key, value;
+		do
+		{
+			if(!std::getline( inp, key, '=' ))
+				break;
+			if(!std::getline( inp, value, '\n' ))
+				break;
+
+			game_info->SetMemberString( key.c_str(), value.c_str() );
+		} while(inp.good());
+	}
+	else
+	{
+		META_CONPRINTF( "Failed to open steam.inf, no game_info would be available in the dump file.\n" );
+	}
+}
+
+void SchemaReader::RecordDumperInfo()
+{
+	auto dumper_info = GetRoot()->FindOrCreateMember( "dumper_info" );
+
+	dumper_info->SetMemberString( "version", g_ThisPlugin.GetVersion() );
+
+	{
+		std::time_t time = std::time( nullptr );
+		std::tm *gtm = std::gmtime( &time );
+
+		char buf[128];
+
+		// Formatted for ISO 8601 UTC time
+		std::strftime( buf, sizeof( buf ), "%Y-%m-%dT%H:%M:%SZ", gtm );
+		dumper_info->SetMemberString( "dump_date", buf );
+	}
+
+	dumper_info->SetMemberInt( "dump_format_version", DUMPER_FILE_FORMAT_VERSION );
+}
+
 void SchemaReader::RecordDumpFlags()
 {
 	auto dump_flags = GetRoot()->FindOrCreateMember( "dump_flags" );
@@ -102,6 +151,9 @@ uint32 SchemaReader::ParseDumpFlags( const char *flags )
 void SchemaReader::ReadSchema( uint32 flags )
 {
 	META_CONPRINTF( "Reading schema...\n" );
+
+	RecordGameInfo();
+	RecordDumperInfo();
 
 	s_Flags = flags;
 	RecordDumpFlags();

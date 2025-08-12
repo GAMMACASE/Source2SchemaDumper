@@ -11,6 +11,8 @@
 #include <string>
 #include <cstring>
 
+#define DUMPER_FILE_FORMAT_VERSION 1
+
 template <typename T>
 constexpr const char *SchemaTypeToString() = delete;
 
@@ -88,6 +90,8 @@ private:
 	KeyValues3 *GetDefs() { return GetRoot()->FindOrCreateMember( "defs" ); }
 	KeyValues3 *GetAtomicDefs() { return GetRoot()->FindOrCreateMember( "atomics" ); }
 
+	void RecordGameInfo();
+	void RecordDumperInfo();
 	void RecordDumpFlags();
 
 	// Returns nullptr if entry already exists
