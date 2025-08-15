@@ -290,7 +290,7 @@ public:
 class CPulseLibraryBinding
 {
 public:
-#if SOURCE_ENGINE == SE_DOTA
+#if SOURCE_ENGINE == SE_DOTA || SOURCE_ENGINE == SE_CS2
 	void *m_unk001;
 #endif
 	CUtlString m_Name;
@@ -307,7 +307,7 @@ public:
 class CPulseDomainInfo
 {
 public:
-#if SOURCE_ENGINE == SE_DOTA
+#if SOURCE_ENGINE == SE_DOTA || SOURCE_ENGINE == SE_CS2
 	void *m_unk001;
 #endif
 	CUtlString m_Name;
