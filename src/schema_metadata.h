@@ -290,6 +290,7 @@ METADATA_TAG( MPropertyCustomFGDType, const char * );
 METADATA_TAG( MPropertySuppressBaseClassField, const char * );
 METADATA_TAG( MPropertyAttributeSuggestionName, const char * );
 METADATA_TAG( MPropertyProvidesEditContextString, const char * );
+METADATA_TAG( MPropertyEditContextOverrideKey, const char * );
 METADATA_TAG( MPropertyCustomEditor, const char * );
 METADATA_TAG( MPropertyEditClassAsString, CSchemaPropertyEditClassAsString );
 METADATA_TAG( MPropertyAttrChangeCallback, FnPropertyAttrChangeCb );
