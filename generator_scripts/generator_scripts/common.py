@@ -46,7 +46,7 @@ def get_hl2sdk_common_types():
 		'CEntityComponentHelper', 'soundlevel_t', 'SoundFlags_t', 'RenderMultisampleType_t', 'EngineLoopState_t', 'GameTime_t',
 		'CUtlSymbol', 'EntityIOTargetType_t', 'EntityDormancyType_t', 'CSplitScreenSlot', 'CHandle', 'CSmartPtr',
 		'CUtlLeanVectorFixedGrowable', 'CUtlLeanVector', 'CUtlVectorFixedGrowable', 'EventClientOutput_t', 'CUtlDict',
-		'ENetworkDisconnectionReason', 'CBitVec', 'Flags_t', 'CPhysSurfacePropertiesVehicle', 'EntityEffects_t'
+		'ENetworkDisconnectionReason', 'CBitVec', 'Flags_t', 'CPhysSurfacePropertiesVehicle', 'EntityEffects_t', 'std::pair'
 	]
 
 def locate_input_path(input_path):

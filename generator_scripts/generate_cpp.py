@@ -486,6 +486,8 @@ def main():
 		context = CppContext(writer, flags)
 
 		writer.write_il('#include "stdint.h"')
+		# For std::pair usage
+		writer.write_il('#include <utility>')
 
 		if args.static_assert:
 			writer.write_il('#include "stddef.h"')
