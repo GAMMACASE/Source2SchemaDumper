@@ -422,11 +422,15 @@ class CppContext:
 
 		for (dep, needs_definition) in class_obj.get_member_deps():
 
-			# Ugly hack to make CUtlLeanVector work with hl2sdk
 			if self.has_flag(ArgsFlags.SupplyingSDK):
+				# Ugly hack to make CUtlLeanVector work with hl2sdk
 				if dep.type == 'atomic' and (dep.name.startswith('CUtlLeanVector') or dep.name.startswith('CUtlVectorFixedGrowable')):
 					for (subdep, subneeds_def) in dep.get_deps():
 						self.process_subtype(subdep, True)
+				
+				# Force define second argument of the hashtable as it expects it to be defined
+				if dep.type == 'atomic' and dep.name.startswith('CUtlHashtable'):
+					self.process_subtype(dep.template_list[1].subtype, True)
 
 			self.process_subtype(dep, needs_definition)
 
