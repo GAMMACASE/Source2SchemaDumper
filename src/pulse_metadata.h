@@ -12,7 +12,6 @@ struct SoundEvent_t
 
 struct SchemaMetadataEntryData_t;
 
-#if SOURCE_ENGINE != SE_DEADLOCK
 enum PulseValueType_t : int32
 {
 	PVAL_INVALID = -1,
@@ -49,37 +48,6 @@ enum PulseValueType_t : int32
 	PVAL_TYPESAFE_INT64 = 29,
 	PVAL_COUNT = 30,
 };
-#elif SOURCE_ENGINE == SE_DEADLOCK
-enum PulseValueType_t : int32
-{
-	PVAL_INVALID = -1,
-	PVAL_BOOL = 0,
-	PVAL_INT = 1,
-	PVAL_FLOAT = 2,
-	PVAL_STRING = 3,
-	PVAL_VEC3 = 4,
-	PVAL_QANGLE = 5,
-	PVAL_VEC3_WORLDSPACE = 6,
-	PVAL_TRANSFORM = 7,
-	PVAL_TRANSFORM_WORLDSPACE = 8,
-	PVAL_COLOR_RGB = 9,
-	PVAL_GAMETIME = 10,
-	PVAL_EHANDLE = 11,
-	PVAL_RESOURCE = 12,
-	PVAL_SNDEVT_GUID = 13,
-	PVAL_SNDEVT_NAME = 14,
-	PVAL_ENTITY_NAME = 15,
-	PVAL_OPAQUE_HANDLE = 16,
-	PVAL_TYPESAFE_INT = 17,
-	PVAL_CURSOR_FLOW = 18,
-	PVAL_ANY = 19,
-	PVAL_SCHEMA_ENUM = 20,
-	PVAL_PANORAMA_PANEL_HANDLE = 21,
-	PVAL_TEST_HANDLE = 22,
-	PVAL_ARRAY = 23,
-	PVAL_COUNT = 24,
-};
-#endif
 
 struct PulseParamType
 {
@@ -115,15 +83,13 @@ struct PulseParamType
 			case PVAL_FLOAT:		ss << "float"; break;
 			case PVAL_STRING:		ss << "string"; break;
 
-#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
 			case PVAL_VEC2:			ss << "vec2"; break;
 			case PVAL_VEC4:			ss << "vec4"; break;
-#endif
-
 			case PVAL_VEC3:			ss << "vec3"; break;
 			case PVAL_QANGLE:		ss << "qangle"; break;
 			case PVAL_TRANSFORM:	ss << "transform"; break;
 			case PVAL_COLOR_RGB:	ss << "color"; break;
+
 			case PVAL_EHANDLE:		ss << "ehandle<" << (m_LibraryClass ? m_LibraryClass : "" ) << ">"; break;
 			case PVAL_RESOURCE:		ss << "resource<" << (m_LibraryClass ? m_LibraryClass : "") << ">"; break;
 			case PVAL_SNDEVT_GUID:	ss << "sndevent_guid"; break;
@@ -132,12 +98,10 @@ struct PulseParamType
 			case PVAL_OPAQUE_HANDLE:ss << (m_LibraryClass ? m_LibraryClass : "schema" ) << "*"; break;
 			case PVAL_TYPESAFE_INT:	ss << (m_LibraryClass ? m_LibraryClass : "!int"); break;
 			case PVAL_CURSOR_FLOW:	ss << "cursor"; break;
-#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
+
 			case PVAL_VARIANT:		ss << "variant"; break;
 			case PVAL_UNKNOWN:		ss << "unknown"; break;
-#else
-			case PVAL_ANY:			ss << "any"; break;
-#endif
+
 			case PVAL_SCHEMA_ENUM:	ss << "enum {" << m_LibraryClass << "}"; break;
 			case PVAL_PANORAMA_PANEL_HANDLE: ss << "panorama_panel_handle"; break;
 			case PVAL_TEST_HANDLE:	ss << "testhandle<" << (m_LibraryClass ? m_LibraryClass : "") << ">"; break;
@@ -198,13 +162,9 @@ public:
 			case PVAL_FLOAT:		return std::to_string( DefaultValue<float>() );
 			case PVAL_STRING:		return DefaultValue<CUtlString>().Get();
 			case PVAL_SCHEMA_ENUM:	return std::to_string( DefaultValue<int64>() );
-#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
 			case PVAL_VARIANT:		return std::to_string( *DefaultValue<int64 *>() );
 			case PVAL_EHANDLE:		return std::to_string( DefaultValue<int32>() );
 			case PVAL_SNDEVT_NAME:	return std::string( "\"" ) + DefaultValue<SoundEvent_t *>()->m_SoundName.Get() + "\"";
-#else
-			case PVAL_ANY:			return std::to_string( *DefaultValue<int64 *>() );
-#endif
 
 			case PVAL_VEC3:
 			{
@@ -290,9 +250,8 @@ public:
 class CPulseLibraryBinding
 {
 public:
-#if SOURCE_ENGINE == SE_DOTA || SOURCE_ENGINE == SE_CS2
 	void *m_unk001;
-#endif
+
 	CUtlString m_Name;
 
 	int m_Flags;
@@ -307,9 +266,8 @@ public:
 class CPulseDomainInfo
 {
 public:
-#if SOURCE_ENGINE == SE_DOTA || SOURCE_ENGINE == SE_CS2
 	void *m_unk001;
-#endif
+
 	CUtlString m_Name;
 	CUtlString m_FriendlyName;
 	CUtlString m_Description;

@@ -90,13 +90,11 @@ struct CSchemaSendProxyRecipientsFilter
 	int m_FilterIndex;
 };
 
-#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
 struct ClassKV3Defaults
 {
 	KeyValues3 *m_Defaults;
 	KeyValues3 *m_unk001;
 };
-#endif
 
 class KeyValues3;
 class IGapTypeQueryRegistrationForScope;
@@ -107,11 +105,7 @@ using FnPropertyAttrExtraInfo = CUtlString (*)(CUtlString &, void *);
 using FnPropertyElementName = void (*)(void *, CUtlString &);
 using FnParticleCustomFieldDefaultValue = bool (*)(KeyValues3 *, KeyValues3 *);
 using FnLeafSuggestionProvider = void (*)(void *);
-#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DOTA
 using FnGetKV3Defaults = ClassKV3Defaults *(*)();
-#else
-using FnGetKV3Defaults = KeyValues3 *(*)();
-#endif
 
 template <typename T>
 struct SchemaMetadataField : public SchemaMetadataEntryData_t
