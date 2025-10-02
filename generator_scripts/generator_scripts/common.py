@@ -2,6 +2,21 @@ from enum import IntFlag
 import os
 import glob
 
+class Helpers:
+	@staticmethod
+	def size_to_int(size, signed = False):
+		match size:
+			case 1:
+				return 'uint8' if not signed else 'int8'
+			case 2:
+				return 'uint16' if not signed else 'int16'
+			case 4:
+				return 'uint32' if not signed else 'int32'
+			case 8:
+				return 'uint64' if not signed else 'int64'
+			case _:
+				raise Exception(f'Invalid size ({size}) to int was performed!')
+
 class ArgsFlags(IntFlag):
 	Empty = 0,
 	AddComments = (1 << 0),

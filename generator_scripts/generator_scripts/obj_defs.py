@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Union
 
-from generator_scripts.common import align_value
+from generator_scripts.common import align_value, Helpers
 
 alignment_overrides = {
 	'EngineLoopState_t': 8
@@ -280,6 +280,7 @@ class SubTypePointer:
 	
 class SubTypeBitfield:
 	bits_count = 0
+	expected_size = 1
 
 	def __init__(self):
 		pass
@@ -294,7 +295,7 @@ class SubTypeBitfield:
 		return 0
 
 	def as_str(self, var_name = None):
-		return f'int8{" " + var_name if var_name is not None else ""} : {self.bits_count}'
+		return f'{Helpers.size_to_int(self.expected_size)}{" " + var_name if var_name is not None else ""} : {self.bits_count}'
 
 	@property
 	def type(self):

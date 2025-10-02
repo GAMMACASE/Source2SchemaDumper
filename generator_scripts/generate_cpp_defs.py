@@ -1,9 +1,8 @@
-from enum import Enum
 import os
 from generate_cpp import CppContext, CppWriter
 from generator_scripts.common import ArgsFlags, locate_input_path, parse_args_as_flags, prepare_out_path, get_hl2sdk_common_types
-from generator_scripts.obj_defs import ClassObjectMember, EnumObjectField, ObjectDefinition, ObjectTypes, SubType, SubTypeAtomic, SubTypeTypes
-from generator_scripts.schema_file import Helpers, SchemaFile
+from generator_scripts.obj_defs import ClassObjectMember, ObjectDefinition, SubTypeAtomic, SubTypeTypes
+from generator_scripts.schema_file import SchemaFile
 import argparse
 
 args = None

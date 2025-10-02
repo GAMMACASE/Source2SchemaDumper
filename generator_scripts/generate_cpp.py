@@ -1,9 +1,9 @@
 from enum import Enum
 import os
 import re
-from generator_scripts.common import ArgsFlags, align_value, get_hl2sdk_common_types, locate_input_path, parse_args_as_flags, prepare_out_path
+from generator_scripts.common import Helpers, ArgsFlags, align_value, get_hl2sdk_common_types, locate_input_path, parse_args_as_flags, prepare_out_path
 from generator_scripts.obj_defs import ClassObjectMember, EnumObjectField, ObjectDefinition, ObjectTypes, SubType, SubTypeAtomic, SubTypeTypes
-from generator_scripts.schema_file import Helpers, SchemaFile, FileWriter
+from generator_scripts.schema_file import SchemaFile, FileWriter
 import argparse
 
 args = None
@@ -46,18 +46,37 @@ class CppWriter(FileWriter):
 			current_offset += 8
 
 		bitfield_accum = 0
+		bitfield_size = 1
+		bitfield_last_member = 0
 		previous_member_alignment = 0
 
-		for member in class_obj.get_members():
+		for i, member in enumerate(class_obj.get_members()):
 			member_size = member.get_type().get_size()
 			member_alignment = member.get_type().get_alignment()
 
 			# Bitfields don't have any offset set
 			if member.get_type().type == SubTypeTypes.BITFIELD and member.offset == 0:
+				# If it's a start of a bitfield sequence, find largest alignment needed for it
+				if bitfield_accum == 0:
+					for j in range(i, len(class_obj.get_members())):
+						adv_member = class_obj.get_members()[j]
+						if adv_member.get_type().type == SubTypeTypes.BITFIELD and adv_member.offset == 0:
+							size_needed = int((adv_member.get_type().bits_count + 7) / 8)
+
+							if size_needed > bitfield_size:
+								bitfield_size = size_needed
+						else:
+							bitfield_last_member = j
+							break
+					for j in range(i, bitfield_last_member):
+						class_obj.get_members()[j].get_type().expected_size = bitfield_size
+
 				bitfield_accum += member.get_type().bits_count
 			else:
 				if bitfield_accum != 0:
 					current_offset += int((bitfield_accum + 7) / 8)
+					bitfield_size = 1
+					bitfield_last_member = 0
 					bitfield_accum = 0
 
 				# Prevent unnecessary padding caused by alignment but ignore any packed classes
@@ -76,6 +95,8 @@ class CppWriter(FileWriter):
 
 		if bitfield_accum != 0:
 			current_offset += int((bitfield_accum + 7) / 8)
+			bitfield_size = 1
+			bitfield_last_member = 0
 			bitfield_accum = 0
 
 		if align_value(current_offset, class_alignment) < class_obj.size:
