@@ -790,6 +790,7 @@ void SchemaReader::ReadPulseBindings()
 	META_CONPRINTF( "Reading pulse_bindings...\n" );
 
 	auto pulse_bindings = GetRoot()->FindOrCreateMember( "pulse_bindings" );
+	pulse_bindings->SetArrayElementCount( 0 );
 
 	std::map<std::string, KeyValues3 *> domains;
 	ReadPulseDomains<MPulseLibraryBindings>( pulse_bindings, domains );
