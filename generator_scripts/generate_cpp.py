@@ -117,7 +117,9 @@ class CppWriter(FileWriter):
 			if align_value(class_obj.size, class_obj.calc_alignment()) != class_obj.size:
 				self.write_il(f'static_assert(false, "Invalid alignment calculated ({class_obj.calc_alignment()}) doesn\'t match the size ({class_obj.size} vs {align_value(class_obj.size, class_obj.calc_alignment())})");')
 
-			self.write_il(f'static_assert(sizeof({class_obj.get_scoped_name()}) == {class_obj.size});')
+			if class_obj.size > 0:
+				self.write_il(f'static_assert(sizeof({class_obj.get_scoped_name()}) == {class_obj.size});')
+			
 			if class_obj.alignment != 255:
 				self.write_il(f'static_assert({class_obj.alignment} == {class_obj.calc_alignment()}, "Inconsistent alignment calculated!");')
 			for member in class_obj.get_members():
