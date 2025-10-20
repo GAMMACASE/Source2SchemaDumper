@@ -14,10 +14,11 @@ This command supports the following arguments:
  * ``metatags``: Dump metatags.
  * ``atomics``: Dump atomics.
  * ``pulse_bindings``: Dump pulse bindings.
+ * ``module_metadata``: Dump module metadata. Only windows is currently supported!
  * ``split_atomics``: Splits templated atomic names and leaves only base name leaving templated stuff. (Makes ``CUtlVector<int>`` to be named as ``CUtlVector`` for example).
  * ``ignore_parents``: Ignores parent scope decls and removes inlined structs/classes converting them from A::B to A__B.
  * ``apply_netvar_overrides``: Applies netvar overrides to types (MNetworkVarTypeOverride metatags).
- * ``all``: Shorthand version of providing ``metatags``, ``atomics`` and ``pulse_bindings`` flags.
+ * ``all``: Shorthand version of providing ``metatags``, ``atomics``, ``pulse_bindings`` and ``module_metadata`` flags.
  * ``for_cpp``: Use optimal flags for cpp generation later, similar to providing ``split_atomics``, ``ignore_parents`` and ``apply_netvar_overrides`` flags.
 > [!NOTE]
 > Pulse bindings are heavily under development by valve, so these are expected to break with each engine update in the supported game list, and would require manual update to the code most likely!
@@ -231,6 +232,10 @@ class CUtlAbstractDelegate { char pad[16]; };
          * ``default_value``: Return default value (If it has one set);
          * Can also have metatags at ``traits/metatags``;
        * Can also have metatags at ``traits/metatags``;
+ * ``modules_metadata``: An array of module metadata provided by game binaries in the following format:
+   * ``module_name``: Name of the module;
+   * ``additional_info``: Additional info provided by the module;
+   * Other data is provided as is from the game binaries and may contain entries such as ``resource_manifests``, ``pulse_fingerprints``, ``pulse_bindings``, etc.
 
 ### Metatags
 

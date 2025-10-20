@@ -51,6 +51,7 @@ public:
 	static bool IsDumpingMetaTags() { return (s_Flags & SR_DUMP_METATAGS) != 0; }
 	static bool IsDumpingAtomics() { return (s_Flags & SR_DUMP_ATOMICS) != 0; }
 	static bool IsDumpingPulseBindings() { return (s_Flags & SR_DUMP_PULSE_BINDINGS) != 0; }
+	static bool IsDumpingModuleMetadata() { return (s_Flags & SR_DUMP_MODULE_METADATA) != 0; }
 	static bool IsSplittingAtomicNames() { return (s_Flags & SR_SPLIT_ATOMIC_NAMES) != 0; }
 	static bool IsIgnoringParentScopes() { return (s_Flags & SR_IGNORE_PARENT_SCOPE) != 0; }
 	static bool IsApplyingNetVarOverrides() { return (s_Flags & SR_APPLY_NETVAR_OVERRIDES) != 0; }
@@ -71,6 +72,7 @@ private:
 	void ReadMetaTags( KeyValues3 *root, SchemaMetadataEntryData_t *data, int count, bool append_traits = false );
 	void ReadFlags( KeyValues3 *root, CSchemaType *type );
 	void ReadPulseBindings();
+	void ReadModuleMetadata();
 
 	template <typename METATAG>
 	void ReadPulseDomains( KeyValues3 *root, std::map<std::string, KeyValues3 *> &domains );
@@ -131,15 +133,17 @@ public:
 		// Dump pulse bindings
 		SR_DUMP_PULSE_BINDINGS = (1 << 5),
 
+		SR_DUMP_MODULE_METADATA = (1 << 6),
+
 		// Splits templated atomic names and leaves only base name leaving templated stuff
-		SR_SPLIT_ATOMIC_NAMES = (1 << 6),
+		SR_SPLIT_ATOMIC_NAMES = (1 << 7),
 
 		// Ignores parent scope decls and removes inlined structs/classes
 		// converting them from A::B to A__B
-		SR_IGNORE_PARENT_SCOPE = (1 << 7),
+		SR_IGNORE_PARENT_SCOPE = (1 << 8),
 
 		// Applies netvar overrides to types (MNetworkVarTypeOverride metatags)
-		SR_APPLY_NETVAR_OVERRIDES = (1 << 8)
+		SR_APPLY_NETVAR_OVERRIDES = (1 << 9)
 	};
 
 	struct DumpFlags_t
@@ -157,12 +161,13 @@ public:
 		{ SR_DUMP_METATAGS, "metatags", "has_metatags", "Dump metatags" },
 		{ SR_DUMP_ATOMICS, "atomics", "has_atomics", "Dump atomics" },
 		{ SR_DUMP_PULSE_BINDINGS, "pulse_bindings", "has_pulse_bindings", "Dump pulse bindings" },
+		{ SR_DUMP_MODULE_METADATA, "module_metadata", "has_module_metadata", "Dump module metadata" },
 		{ SR_SPLIT_ATOMIC_NAMES, "split_atomics", "atomic_names_split", "Splits templated atomic names and leaves only base name leaving templated stuff" },
 		{ SR_IGNORE_PARENT_SCOPE, "ignore_parents", "no_parent_scope", "Ignores parent scope decls and removes inlined structs/classes converting them from A::B to A__B" },
 		{ SR_APPLY_NETVAR_OVERRIDES, "apply_netvar_overrides", "netvars_overriden", "Applies netvar overrides to types (MNetworkVarTypeOverride metatags)" },
 
 		// Supplementary definitions
-		{ SR_DUMP_METATAGS | SR_DUMP_ATOMICS | SR_DUMP_PULSE_BINDINGS, "all", nullptr, "Dumps everything" },
+		{ SR_DUMP_METATAGS | SR_DUMP_ATOMICS | SR_DUMP_PULSE_BINDINGS | SR_DUMP_MODULE_METADATA, "all", nullptr, "Dumps everything" },
 		{ SR_SPLIT_ATOMIC_NAMES | SR_IGNORE_PARENT_SCOPE | SR_APPLY_NETVAR_OVERRIDES, "for_cpp", nullptr, "Use optimal flags for cpp generation later" },
 	};
 };

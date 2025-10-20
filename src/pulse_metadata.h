@@ -46,7 +46,8 @@ enum PulseValueType_t : int32
 	PVAL_TEST_HANDLE = 27,
 	PVAL_ARRAY = 28,
 	PVAL_TYPESAFE_INT64 = 29,
-	PVAL_COUNT = 30,
+	PVAL_PARTICLE_EHANDLE = 30,
+	PVAL_COUNT = 31,
 };
 
 struct PulseParamType
@@ -105,6 +106,8 @@ struct PulseParamType
 			case PVAL_SCHEMA_ENUM:	ss << "enum {" << m_LibraryClass << "}"; break;
 			case PVAL_PANORAMA_PANEL_HANDLE: ss << "panorama_panel_handle"; break;
 			case PVAL_TEST_HANDLE:	ss << "testhandle<" << (m_LibraryClass ? m_LibraryClass : "") << ">"; break;
+			case PVAL_PARTICLE_EHANDLE: ss << "particle_ehandle"; break;
+
 			default:
 			{
 				if(SchemaReader::IsVerboseLogging())

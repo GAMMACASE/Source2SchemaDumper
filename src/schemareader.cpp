@@ -8,6 +8,11 @@
 #include <filesystem>
 #include <ctime>
 
+#if PLATFORM_WINDOWS
+#include <windows.h>
+#include <tlhelp32.h>
+#endif
+
 CSchemaSystem *SchemaReader::SchemaSystem()
 {
 	static CSchemaSystem *s_SchemaSystem = nullptr;
@@ -163,6 +168,7 @@ void SchemaReader::ReadSchema( uint32 flags )
 	ReadDeclEnums();
 	ReadAtomics();
 	ReadPulseBindings();
+	ReadModuleMetadata();
 }
 
 void SchemaReader::SetOutDir( const std::filesystem::path &out_dir )
@@ -797,6 +803,58 @@ void SchemaReader::ReadPulseBindings()
 	ReadPulseDomains<MPulseCellMethodBindings>( pulse_bindings, domains );
 
 	ReadPulseDomainsInfo( pulse_bindings, domains );
+}
+
+void SchemaReader::ReadModuleMetadata()
+{
+	if(!IsDumpingModuleMetadata())
+		return;
+
+#ifndef PLATFORM_WINDOWS
+	META_CONPRINTF( "Reading module metadata is only supported on windows, skipping...\n" );
+#else
+	META_CONPRINTF( "Reading module metadata...\n" );
+
+	auto modules_metadata = GetRoot()->FindOrCreateMember( "modules_metadata" );
+	modules_metadata->SetArrayElementCount( 0 );
+
+	HANDLE snapshot = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, GetCurrentProcessId() );
+
+	if(snapshot != INVALID_HANDLE_VALUE)
+	{
+		MODULEENTRY32 module_entry = { sizeof( module_entry ) };
+		if(Module32First( snapshot, &module_entry ))
+		{
+			do
+			{
+				if(module_entry.hModule)
+				{
+					auto func = (KeyValues3 * (*)(CUtlString *))GetProcAddress( module_entry.hModule, "ExtractModuleMetadata" );
+					if(func)
+					{
+						CUtlString additional_info;
+						auto metadata = func( &additional_info );
+
+						if(metadata->IsNull())
+							continue;
+
+						auto entry = modules_metadata->ArrayAddElementToTail();
+
+						*entry = *metadata;
+						entry->SetMemberString( "module_name", module_entry.szModule );
+
+						if(!additional_info.IsEmpty())
+							entry->SetMemberString( "additional_info", additional_info );
+					}
+					
+				}
+
+			} while(Module32Next( snapshot, &module_entry ));
+		}
+
+		CloseHandle( snapshot );
+	}
+#endif
 }
 
 CSchemaType_DeclaredClass *SchemaReader::FindSchemaTypeInTypeScopes( const char *name )
