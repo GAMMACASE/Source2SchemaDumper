@@ -124,6 +124,7 @@ def main():
 	parser.add_argument('-s', '--silent', help = 'Disables stdout output.', action = 'store_true', dest = 'silent')
 	parser.add_argument('-c', '--comments', help = 'Generate help comments for resulting class/enum definitions.', action = 'store_true', dest = 'add_comments')
 	parser.add_argument('-g', '--generate-classes', help = 'A list of class/enum definitions to generate.', required = True, nargs = '+', type = str, dest = 'generate_classes', default = None)
+	parser.add_argument('-p', '--preferred-project', help = 'Prefer server or client project for generation.', type = str, dest = 'preferred_project', choices=['server', 'client'], default = 'server')
 
 	args = parser.parse_args()
 	flags = parse_args_as_flags(args)
@@ -144,14 +145,23 @@ def main():
 		print_stdout(f'Generating ({", ".join(args.generate_classes)}) class definitions...')
 			
 		for class_name in args.generate_classes:
-			defn = schema_file.defs.get_def_at_name(class_name)
+			start_at = 0
 
-			if defn == None:
-				print_stdout(f'Class definition ({class_name}) not found in schema file, failed to generate!')
-				continue
+			while start_at < len(schema_file.defs):
+				defn = schema_file.defs.get_def_at_name(class_name, start_at)
 
-			total_generated += 1
-			context.process_object(defn)
+				if defn == None:
+					print_stdout(f'Class definition ({class_name}) not found in schema file, failed to generate! {start_at}')
+					break
+
+				start_at = schema_file.defs.get_def_idx(defn) + 1
+
+				if defn.project in ['server', 'client'] and defn.project != args.preferred_project:
+					continue
+
+				total_generated += 1
+				context.process_object(defn)
+				break
 	
 	print_stdout(f'Successfully generated C++ file at {os.path.abspath(args.out_path)} (Total objects processed: {total_generated})')
 

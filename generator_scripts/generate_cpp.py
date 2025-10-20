@@ -496,6 +496,7 @@ def main():
 	parser.add_argument('-g', '--generate-classes', help = 'A list of class/enum definitions to generate. Use "all" to generate all classes (Default).', nargs = '+', type = str, dest = 'generate_classes', default = 'all')
 	parser.add_argument('-a', '--static-assert', help = 'Generate static assertions of resulting class/enum definitions to ensure their validity.', action = 'store_true', dest = 'static_assert')
 	parser.add_argument('-d', '--supply-hl2sdk', help = 'Supplies hl2sdk class/enum definitions if applicable to the generated file.', action = 'store_true', dest = 'supply_hl2sdk')
+	parser.add_argument('-p', '--preferred-project', help = 'Prefer server or client project for generation.', type = str, dest = 'preferred_project', choices=['server', 'client'], default = 'server')
 
 	args = parser.parse_args()
 	flags = parse_args_as_flags(args)
@@ -629,6 +630,9 @@ def main():
 			print_stdout('Generating all class definitions...')
 
 			for defn in schema_file.defs:
+				if defn.project in ['server', 'client'] and defn.project != args.preferred_project:
+					continue
+
 				total_generated += 1
 				context.process_object(defn)
 		else:

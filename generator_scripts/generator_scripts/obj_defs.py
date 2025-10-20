@@ -669,8 +669,8 @@ class ObjectList:
 		self.synth_defs.append(ObjectDefinition.generate_synthetic_class(name))
 		return self.synth_defs[-1]
 
-	def get_def_at_name(self, name):
-		for defn in self.defs:
+	def get_def_at_name(self, name, start_at = 0):
+		for defn in self.defs[start_at:]:
 			if defn.name == name:
 				return defn
 		return None

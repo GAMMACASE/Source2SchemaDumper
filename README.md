@@ -40,6 +40,7 @@ This plugin comes with a set of particular python generator scripts located in t
    * ``-g`` ``--generate-classes``: A list of class/enum definitions to generate. Use "all" to generate all classes (Default).
    * ``-a`` ``--static-assert``: Generate static assertions of resulting class/enum definitions to ensure their validity.
    * ``-d`` ``--supply-hl2sdk``: Supplies hl2sdk class/enum definitions if applicable to the generated file.
+   * ``-p`` ``--preferred-project``: Prefer server or client project for generation. (Could only be ``server`` or ``client``). Default is ``server``.
 > [!NOTE]
 > Schema dumps with parent scope, might not generate correct code without supplying [hl2sdk](https://github.com/alliedmodders/hl2sdk) definitions!
     
@@ -51,6 +52,7 @@ This plugin comes with a set of particular python generator scripts located in t
    * ``-s`` ``--silent``: Disables stdout output.
    * ``-c`` ``--comments``: Generate help comments for resulting class/enum definitions.
    * ``-g`` ``--generate-classes``: A list of class/enum definitions to generate. Doesn't default to "all" and expects you to provide classes to generate.
+   * ``-p`` ``--preferred-project``: Prefer server or client project for generation. (Could only be ``server`` or ``client``). Default is ``server``.
 > [!NOTE]
 > This script is mostly an example of how you can automate dumping schema to macro headers for plugins that use [s2ze](https://github.com/Source2ZE/CS2Fixes) alike schema systems.
 
