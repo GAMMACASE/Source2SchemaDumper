@@ -108,15 +108,7 @@ private:
 private:
 	CKeyValues3Context m_KV3Context;
 
-	struct KeyLess
-	{
-		bool operator()( const CSchemaType *lhs, const CSchemaType *rhs ) const
-		{
-			return std::strcmp( lhs->m_sTypeName, rhs->m_sTypeName ) < 0;
-		}
-	};
-
-	std::map<CSchemaType *, int, KeyLess> m_TypeMap;
+	std::map<CSchemaType *, int> m_TypeMap;
 	std::filesystem::path m_OutPath;
 
 	inline static uint32 s_Flags = 0;
