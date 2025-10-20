@@ -1,7 +1,7 @@
 from enum import Enum
 import os
 import re
-from generator_scripts.common import Helpers, ArgsFlags, align_value, get_hl2sdk_common_types, locate_input_path, parse_args_as_flags, prepare_out_path
+from generator_scripts.common import Helpers, ArgsFlags, align_value, get_hl2sdk_common_types, get_std_common_types, locate_input_path, parse_args_as_flags, prepare_out_path
 from generator_scripts.obj_defs import ClassObjectMember, EnumObjectField, ObjectDefinition, ObjectTypes, SubType, SubTypeAtomic, SubTypeTypes
 from generator_scripts.schema_file import SchemaFile, FileWriter
 import argparse
@@ -511,6 +511,8 @@ def main():
 	total_generated = 0
 	with CppWriter(open(args.out_path, 'w'), flags) as writer:
 		context = CppContext(writer, flags)
+
+		context.add_overrides(get_std_common_types())
 
 		writer.write_il('#include "stdint.h"')
 		# For std::pair usage
