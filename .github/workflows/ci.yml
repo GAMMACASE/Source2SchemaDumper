@@ -89,14 +89,15 @@ jobs:
           repository: alliedmodders/ambuild
           path: ambuild
 
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3'
-
-      - name: Install AMBuild
+      - name: Install AMBuild win
+        if: matrix.os == 'ubuntu-latest'
         run: |
           cd ambuild && python -m pip install . && cd ..
+
+      - name: Install AMBuild linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cd ambuild && python setup.py install && cd ..
 
       - name: Install Clang 16
         if: matrix.os == 'ubuntu-latest'
