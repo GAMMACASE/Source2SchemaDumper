@@ -108,7 +108,11 @@ private:
 	std::string SplitTemplatedName( CSchemaType *type ) const;
 
 private:
+#if SOURCE_ENGINE == SE_CS2
+	CKV3Arena m_KV3Context;
+#else
 	CKeyValues3Context m_KV3Context;
+#endif
 
 	std::map<CSchemaType *, int> m_TypeMap;
 	std::filesystem::path m_OutPath;
