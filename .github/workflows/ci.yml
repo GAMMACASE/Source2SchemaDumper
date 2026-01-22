@@ -90,7 +90,7 @@ jobs:
           path: ambuild
 
       - name: Install AMBuild win
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'windows-latest'
         run: |
           cd ambuild && python -m pip install . && cd ..
 
