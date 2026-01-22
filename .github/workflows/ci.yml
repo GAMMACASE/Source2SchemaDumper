@@ -91,7 +91,7 @@ jobs:
 
       - name: Install AMBuild
         run: |
-          cd ambuild && python setup.py install && cd ..
+          cd ambuild && pip install . && cd ..
 
       - name: Install Clang 16
         if: matrix.os == 'ubuntu-latest'
