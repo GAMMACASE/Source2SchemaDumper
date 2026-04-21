@@ -106,6 +106,8 @@ using FnPropertyElementName = void (*)(void *, CUtlString &);
 using FnParticleCustomFieldDefaultValue = bool (*)(KeyValues3 *, KeyValues3 *);
 using FnLeafSuggestionProvider = void (*)(void *);
 using FnGetKV3Defaults = ClassKV3Defaults *(*)();
+using FnVDataOutlinerLeafName = void (*)(void *, int, CBufferString &out);
+using FnDebugSnapshotDataSummary = bool (*)(void *, CBufferString &out);
 
 template <typename T>
 struct SchemaMetadataField : public SchemaMetadataEntryData_t
@@ -279,6 +281,7 @@ METADATA_TAG( MPropertyAttributeChoiceName, const char * );
 METADATA_TAG( MPropertyGroupName, const char * );
 METADATA_TAG( MPropertyAttributeEditor, const char * );
 METADATA_TAG( MPropertySuppressExpr, const char * );
+METADATA_TAG( MPropertyReadonlyExpr, const char * );
 METADATA_TAG( MPropertyArrayElementNameKey, const char * );
 METADATA_TAG( MPropertyCustomFGDType, const char * );
 METADATA_TAG( MPropertySuppressBaseClassField, const char * );
@@ -321,7 +324,13 @@ METADATA_TAG( MIsBoxedFloatType, empty_t );
 
 METADATA_TAG( MModelGameData, empty_t );
 METADATA_TAG( MGapNotNull, empty_t );
+METADATA_TAG( MNotSaved, empty_t );
+METADATA_TAG( MPhysPtr, empty_t );
+METADATA_TAG( MDebugSnapshotDataRenderable, empty_t );
+METADATA_TAG( MDebugSnapshotDataRenderByDefault, empty_t );
 METADATA_TAG( MCustomFGDMetadata, const char * );
+METADATA_TAG( MKV3TransferSaveOpsForField, const char * );
+METADATA_TAG( MSaveOpsForField, const char * );
 METADATA_TAG( MFgdFromSchemaEditablePolymorphicThisClass, empty_t );
 METADATA_TAG( MFgdFromSchemaCompletelySkipField, empty_t );
 METADATA_TAG( MFgdHelper, const char * );
@@ -332,6 +341,10 @@ METADATA_TAG( MEnumFlagsWithOverlappingBits, empty_t );
 METADATA_TAG( MAtomicTransfersAsPlainString, empty_t );
 METADATA_TAG( MAtomicTransfersAsMap, empty_t );
 METADATA_TAG( MIsStringAndTokenType, empty_t );
+METADATA_TAG( MPtrAutoallocate, empty_t );
+METADATA_TAG( MGPUParticleFunction, empty_t );
+METADATA_TAG( MVDataOutlinerLeafNameFn, FnVDataOutlinerLeafName );
+METADATA_TAG( MDebugSnapshotDataSummaryFn, FnVDataOutlinerLeafName );
 
 METADATA_TAG( MObsoleteParticleFunction, empty_t );
 METADATA_TAG( MClassIsParticleModel, empty_t );
