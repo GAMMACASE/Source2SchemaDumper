@@ -407,6 +407,7 @@ int SchemaReader::ReadDeclClass( CSchemaType_DeclaredClass *type )
 		// Ugly hack to prevent stringifying corrupted kv3 getter in that class,
 		// otherwise it'll crash when attempted to be retrieved
 		if(std::strcmp( ci->m_pszName, "CastSphereSATParams_t" ) != 0 &&
+			std::strcmp( ci->m_pszName, "fogplayerparams_t" ) != 0 &&
 			// This one outputs corrupted string symbols (mostly just pure data bytes of something)
 			// which will trip json parsers later
 			std::strcmp( ci->m_pszName, "modifiedconvars_t" ) != 0)
