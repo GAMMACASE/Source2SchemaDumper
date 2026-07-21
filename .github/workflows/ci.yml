@@ -48,6 +48,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: schemadump
+          fetch-tags: true
       
       - name: Checkout Metamod-Source
         uses: actions/checkout@v4
