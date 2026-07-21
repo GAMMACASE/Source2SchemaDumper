@@ -108,6 +108,11 @@ jobs:
           ${{ matrix.compiler_cc }} --version
           ${{ matrix.compiler_cxx }} --version
 
+      - name: Install LLD Linker
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          apt update && apt install -y lld
+
       - name: Build
         working-directory: schemadump
         run: |
