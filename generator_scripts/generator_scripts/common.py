@@ -60,7 +60,7 @@ def get_hl2sdk_common_types():
 		'CPhysSurfacePropertiesAudio', 'CPhysSurfaceProperties', 'CHitBox', 'CEntityHandle', 'ChangeAccessorFieldPathIndex_t',
 		'CEntityComponentHelper', 'soundlevel_t', 'SoundFlags_t', 'RenderMultisampleType_t', 'EngineLoopState_t', 'GameTime_t',
 		'CUtlSymbol', 'EntityIOTargetType_t', 'EntityDormancyType_t', 'CSplitScreenSlot', 'CHandle', 'CSmartPtr', 'VectorWS',
-		'CUtlLeanVectorFixedGrowable', 'CUtlLeanVector', 'CUtlVectorFixedGrowable', 'EventClientOutput_t', 'CUtlDict', 'BASEPTR',
+		'CUtlLeanVectorFixedGrowable', 'CUtlLeanVector', 'CUtlVectorFixedGrowable', 'EventClientOutput_t', 'CUtlDict', 'BASEPTR', 'ENTITYFUNCPTR', 'USEPTR'
 		'ENetworkDisconnectionReason', 'CBitVec', 'CTypedBitVec', 'Flags_t', 'CPhysSurfacePropertiesVehicle', 'EntityEffects_t', 'CEntityKeyValues'
 	]
 
