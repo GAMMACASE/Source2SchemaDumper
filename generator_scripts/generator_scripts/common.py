@@ -62,7 +62,7 @@ def get_hl2sdk_common_types():
 		'CUtlSymbol', 'EntityIOTargetType_t', 'EntityDormancyType_t', 'CSplitScreenSlot', 'CHandle', 'CSmartPtr', 'VectorWS',
 		'CUtlLeanVectorFixedGrowable', 'CUtlLeanVector', 'CUtlVectorFixedGrowable', 'EventClientOutput_t', 'CUtlDict', 'BASEPTR', 'ENTITYFUNCPTR', 'USEPTR'
 		'ENetworkDisconnectionReason', 'CBitVec', 'CTypedBitVec', 'Flags_t', 'CPhysSurfacePropertiesVehicle', 'EntityEffects_t', 'CEntityKeyValues'
-		'ItemFlagTypes_t', 'DamageTypes_t', 'ObserverMode_t', 'EntityDisolveType_t', 'Class_T'
+		'ItemFlagTypes_t', 'DamageTypes_t', 'ObserverMode_t', 'EntityDisolveType_t', 'Class_T', 'InputBitMask_t'
 	]
 
 def get_std_common_types():
