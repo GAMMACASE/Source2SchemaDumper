@@ -239,27 +239,28 @@ class CppWriter(FileWriter):
 		return self
 
 	def enum_declaration(self, enum_obj: ObjectDefinition):
-		is_signed = min(map(lambda x: x.value, enum_obj.get_fields())) < 0
-		return self.write_il(f'enum class {enum_obj.name} : {Helpers.size_to_int(enum_obj.size, is_signed)};').newl().newl()
+		return self.write_il(f'enum class {enum_obj.name} : {Helpers.size_to_int(enum_obj.size, enum_obj.is_signed())};').newl().newl()
 
 	def enum_definition(self, enum_obj: ObjectDefinition):
 		self.enum_entry_start(enum_obj)
 
+		value_postfix = 'u' if not enum_obj.is_signed() else ''
+		value_postfix += 'll' if enum_obj.size > 4 else ''
+
 		for field in enum_obj.get_fields():
-			self.enum_member_entry(field, enum_obj.is_bitfield())
+			self.enum_member_entry(field, enum_obj.is_bitfield(), value_postfix)
 
 		self.enum_entry_end()
-		self.newl().enum_static_asserts(enum_obj)
+		self.newl().enum_static_asserts(enum_obj, value_postfix)
 
 		return self
 
-	def enum_static_asserts(self, enum_obj: ObjectDefinition):
+	def enum_static_asserts(self, enum_obj: ObjectDefinition, value_postfix = ''):
 		if self.has_flag(ArgsFlags.StaticAsserts):
 			for field in enum_obj.get_fields():
-				self.write_il(f'static_assert({enum_obj.get_scoped_name()}::{field.name} == ({enum_obj.get_scoped_name()}){field.value});')
+				self.write_il(f'static_assert({enum_obj.get_scoped_name()}::{field.name} == ({enum_obj.get_scoped_name()}){field.value}{value_postfix});')
 
-			is_signed = min(map(lambda x: x.value, enum_obj.get_fields())) < 0
-			self.write_il(f'static_assert(sizeof({enum_obj.get_scoped_name()}) == sizeof({Helpers.size_to_int(enum_obj.size, is_signed)}));')
+			self.write_il(f'static_assert(sizeof({enum_obj.get_scoped_name()}) == sizeof({Helpers.size_to_int(enum_obj.size, enum_obj.is_signed())}));')
 			self.newl()
 		
 		return self
@@ -270,8 +271,7 @@ class CppWriter(FileWriter):
 		for metatag in enum_obj.get_metadata():
 			self.write_comment_check(f'{metatag.name}' + (' = ' + metatag.value if metatag.has_value() else ''))
 
-		is_signed = min(map(lambda x: x.value, enum_obj.get_fields())) < 0
-		self.write_il(f'enum class {enum_obj.get_scoped_name()} : {Helpers.size_to_int(enum_obj.size, is_signed)}')
+		self.write_il(f'enum class {enum_obj.get_scoped_name()} : {Helpers.size_to_int(enum_obj.size, enum_obj.is_signed())}')
 		self.write_il('{').indent()
 
 		return self
@@ -283,14 +283,20 @@ class CppWriter(FileWriter):
 		self.enum_indent -= 1
 		return self.dedent().write_il('};')
 	
-	def enum_member_entry(self, enum_field: EnumObjectField, is_bitfield = False):
+	def enum_member_entry(self, enum_field: EnumObjectField, is_bitfield = False, value_postfix = ''):
+		global args
 		if self.enum_indent <= 0:
 			raise Exception('Cannot write enum member entry outside of enum')
 
 		for metatag in enum_field.get_metadata():
 			self.write_comment_check(f'{metatag.name}' + (' = ' + metatag.value if metatag.has_value() else ''))
 
-		return self.write_il(f'{enum_field.name} = {enum_field.value},' + (f' // (1 << {enum_field.value.bit_length() - 1})' if is_bitfield and enum_field.value > 0 else ''))
+		bit_field_value = f'(1{value_postfix} << {enum_field.value.bit_length() - 1})' if is_bitfield and enum_field.value > 0 else None
+
+		if args.force_bitfield_enums and bit_field_value is not None:
+			return self.write_il(f'{enum_field.name} = {bit_field_value},')
+		else:
+			return self.write_il(f'{enum_field.name} = {enum_field.value}{value_postfix},' + (f' // {bit_field_value}' if bit_field_value is not None else ''))
 
 class CppContext:
 	writer: CppWriter = None
@@ -497,6 +503,7 @@ def main():
 	parser.add_argument('-a', '--static-assert', help = 'Generate static assertions of resulting class/enum definitions to ensure their validity.', action = 'store_true', dest = 'static_assert')
 	parser.add_argument('-d', '--supply-hl2sdk', help = 'Supplies hl2sdk class/enum definitions if applicable to the generated file.', action = 'store_true', dest = 'supply_hl2sdk')
 	parser.add_argument('-p', '--preferred-project', help = 'Prefer server or client project for generation.', type = str, dest = 'preferred_project', choices=['server', 'client'], default = 'server')
+	parser.add_argument('-e', '--force-bitfield-enums', help = 'Force enum bitshifts to be used instead of decimal values for bitfield enums.', action = 'store_true', dest = 'force_bitfield_enums')
 
 	args = parser.parse_args()
 	flags = parse_args_as_flags(args)

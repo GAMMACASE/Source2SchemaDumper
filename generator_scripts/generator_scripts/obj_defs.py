@@ -568,6 +568,9 @@ class ObjectDefinition:
 		# don't treat small enums as bitfields
 		return is_bitfield and max_reached > 2
 
+	def is_signed(self):
+		return min(map(lambda x: x.value, self.get_fields())) < 0
+
 	# Will result in at infinite loop if there is a circular dependency
 	def resolve_child_scope_order(self, child_scopes):
 		for i, child_scope in enumerate(child_scopes):

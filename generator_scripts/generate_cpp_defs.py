@@ -125,6 +125,7 @@ def main():
 	parser.add_argument('-c', '--comments', help = 'Generate help comments for resulting class/enum definitions.', action = 'store_true', dest = 'add_comments')
 	parser.add_argument('-g', '--generate-classes', help = 'A list of class/enum definitions to generate.', required = True, nargs = '+', type = str, dest = 'generate_classes', default = None)
 	parser.add_argument('-p', '--preferred-project', help = 'Prefer server or client project for generation.', type = str, dest = 'preferred_project', choices=['server', 'client'], default = 'server')
+	parser.add_argument('-e', '--force-bitfield-enums', help = 'Force enum bitshifts to be used instead of decimal values for bitfield enums.', action = 'store_true', dest = 'force_bitfield_enums')
 
 	args = parser.parse_args()
 	flags = parse_args_as_flags(args)
