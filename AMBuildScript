@@ -452,15 +452,14 @@ const char *PLUGIN_REVISION_COUNT = \"{revision_count}\";
   
   def HL2Library(self, context, compiler, name, sdk):
     binary = self.Library(compiler, name)
-    mms_core_path = os.path.join(self.mms_root, 'core')
     cxx = binary.compiler
     
     self.addVersioning(cxx)
 
     cxx.cxxincludes += [
       os.path.join(context.currentSourcePath),
-      os.path.join(mms_core_path),
-      os.path.join(mms_core_path, 'sourcehook'),
+      os.path.join(self.mms_root, 'core'),
+      os.path.join(self.mms_root, 'third_party', 'khook', 'include')
     ]
 
     for other_sdk in self.sdk_manifests:
