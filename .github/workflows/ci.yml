@@ -34,7 +34,7 @@ jobs:
             compiler_cc: clang
             compiler_cxx: clang++
             sdks: '["cs2", "dota"]'
-            container: registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk
+            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
       fail-fast: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -101,7 +101,7 @@ jobs:
         run: |
           cd ambuild && python setup.py install && cd ..
 
-      - name: Install Clang 16
+      - name: Install Clang
         if: matrix.os == 'ubuntu-latest'
         run: |
           echo "CC=${{ matrix.compiler_cc }}" >> $GITHUB_ENV
@@ -112,7 +112,7 @@ jobs:
       - name: Install LLD Linker
         if: matrix.os == 'ubuntu-latest'
         run: |
-          apt update && apt install -y lld
+          apt -o Acquire::Check-Valid-Until=false update && apt install -y lld
 
       - name: Build
         working-directory: schemadump
