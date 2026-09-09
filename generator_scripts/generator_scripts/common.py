@@ -22,14 +22,16 @@ class ArgsFlags(IntFlag):
 	AddComments = (1 << 0),
 	SupplyingSDK = (1 << 1),
 	StaticAsserts = (1 << 2),
-	Silent = (1 << 3)
+	Silent = (1 << 3),
+	ForceBitfieldEnums = (1 << 4)
 
 def parse_args_as_flags(args, base_flags = ArgsFlags.Empty):
 	additive_flag_map = {
 		"add_comments": ArgsFlags.AddComments,
 		"supply_hl2sdk": ArgsFlags.SupplyingSDK,
 		"static_assert": ArgsFlags.StaticAsserts,
-		"silent": ArgsFlags.Silent
+		"silent": ArgsFlags.Silent,
+		"force_bitfield_enums": ArgsFlags.ForceBitfieldEnums
 	}
 
 	negative_flag_map = {

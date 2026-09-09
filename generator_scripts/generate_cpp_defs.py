@@ -102,7 +102,7 @@ class CppDefsWriter(CppWriter):
 	def atomic_definition(self, atomic: SubTypeAtomic):
 		return self
 
-	def enum_static_asserts(self, enum_obj: ObjectDefinition):
+	def enum_static_asserts(self, enum_obj: ObjectDefinition, value_postfix = ''):
 		return self
 
 def print_stdout(text):

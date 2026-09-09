@@ -284,7 +284,6 @@ class CppWriter(FileWriter):
 		return self.dedent().write_il('};')
 	
 	def enum_member_entry(self, enum_field: EnumObjectField, is_bitfield = False, value_postfix = ''):
-		global args
 		if self.enum_indent <= 0:
 			raise Exception('Cannot write enum member entry outside of enum')
 
@@ -293,7 +292,7 @@ class CppWriter(FileWriter):
 
 		bit_field_value = f'(1{value_postfix} << {enum_field.value.bit_length() - 1})' if is_bitfield and enum_field.value > 0 else None
 
-		if args.force_bitfield_enums and bit_field_value is not None:
+		if self.has_flag(ArgsFlags.ForceBitfieldEnums) and bit_field_value is not None:
 			return self.write_il(f'{enum_field.name} = {bit_field_value},')
 		else:
 			return self.write_il(f'{enum_field.name} = {enum_field.value}{value_postfix},' + (f' // {bit_field_value}' if bit_field_value is not None else ''))
