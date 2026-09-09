@@ -34,7 +34,7 @@ jobs:
             compiler_cc: clang
             compiler_cxx: clang++
             sdks: '["cs2", "dota"]'
-            container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
+            container: registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk
       fail-fast: false
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
@@ -101,15 +101,6 @@ jobs:
         run: |
           cd ambuild && python setup.py install && cd ..
 
-      - name: Install Clang 16
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          apt update && apt install -y clang-16
-          echo "CC=${{ matrix.compiler_cc }}" >> $GITHUB_ENV
-          echo "CXX=${{ matrix.compiler_cxx }}" >> $GITHUB_ENV
-          ${{ matrix.compiler_cc }} --version
-          ${{ matrix.compiler_cxx }} --version
-
       - name: Install LLD Linker
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -120,7 +111,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          python ../configure.py --enable-optimize --sdks=${{ join(fromJSON(matrix.sdks)) }}
+          CC=${{ matrix.compiler_cc }} CXX=${{ matrix.compiler_cxx }} python ../configure.py --enable-optimize --sdks=${{ join(fromJSON(matrix.sdks)) }}
           ambuild
 
       - name: Upload artifact
