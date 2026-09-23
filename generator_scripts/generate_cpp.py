@@ -524,6 +524,7 @@ def main():
 		writer.write_il('#include "stdint.h"')
 		# For std::pair usage
 		writer.write_il('#include <utility>')
+		writer.write_il('#include <memory>')
 
 		if args.static_assert:
 			writer.write_il('#include "stddef.h"')
@@ -612,6 +613,10 @@ def main():
 			writer.write_il('#include "utllinkedlist.h"')
 			writer.write_il('#include "utlvector.h"')
 			writer.write_il('#include "utltshash.h"')
+			
+			writer.newl()
+			
+			writer.write_il('#include "shareddefs.h"')
 
 			if args.static_assert:
 				writer.newl()
