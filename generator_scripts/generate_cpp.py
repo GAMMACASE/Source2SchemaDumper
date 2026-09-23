@@ -68,6 +68,10 @@ class CppWriter(FileWriter):
 						else:
 							bitfield_last_member = j
 							break
+
+					if bitfield_last_member == 0:
+						bitfield_last_member = len(class_obj.get_members())
+					
 					for j in range(i, bitfield_last_member):
 						class_obj.get_members()[j].get_type().expected_size = bitfield_size
 
