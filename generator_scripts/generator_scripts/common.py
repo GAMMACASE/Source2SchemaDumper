@@ -51,10 +51,10 @@ def parse_args_as_flags(args, base_flags = ArgsFlags.Empty):
 
 def get_hl2sdk_common_types():
 	return [
-		'int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32', 'int64', 'uint64', 'float32', 'float64',
-		'CUtlVector', 'VectorAligned', 'Vector', 'Vector2D', 'Vector4D', 'matrix3x4_t', 'matrix3x4a_t',
-		'QAngle', 'Quaternion', 'Color', 'CUtlString', 'CUtlStringToken', 'CUtlMap', 'CUtlOrderedMap',
-		'RadianEuler', 'ThreeState_t', 'CBufferString', 'CBufferStringN', 'CUtlHashtable', 'CUtlLinkedList',
+		'int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32', 'int64', 'uint64', 'float32', 'float64', 'ENetworkDisconnectionReason',
+		'CUtlVector', 'VectorAligned', 'Vector', 'Vector2D', 'Vector4D', 'matrix3x4_t', 'matrix3x4a_t', 'CPulseArgumentPack',
+		'QAngle', 'Quaternion', 'Color', 'CUtlString', 'CUtlStringToken', 'CUtlMap', 'CUtlOrderedMap', 'CPulseInputParamMap',
+		'RadianEuler', 'ThreeState_t', 'CBufferString', 'CBufferStringN', 'CUtlHashtable', 'CUtlLinkedList', 'CEntityKeyValues',
 		'KeyValues', 'KeyValues3', 'SolidType_t', 'RenderMode_t', 'RenderFx_t', 'MoveType_t', 'MoveCollide_t', 'LifeState_t',
 		'CEntityIdentity', 'CEntityInstance', 'WorldGroupId_t', 'CEntityIndex', 'CPlayerSlot', 'HitGroup_t',
 		'EntComponentInfo_t', 'CVariantDefaultAllocator', 'CVariant', 'CVariantBase', 'CUtlSymbolLarge', 'CTransform', 'HSCRIPT',
@@ -62,13 +62,13 @@ def get_hl2sdk_common_types():
 		'CPhysSurfacePropertiesAudio', 'CPhysSurfaceProperties', 'CHitBox', 'CEntityHandle', 'ChangeAccessorFieldPathIndex_t',
 		'CEntityComponentHelper', 'soundlevel_t', 'SoundFlags_t', 'RenderMultisampleType_t', 'EngineLoopState_t', 'GameTime_t',
 		'CUtlSymbol', 'EntityIOTargetType_t', 'EntityDormancyType_t', 'CSplitScreenSlot', 'CHandle', 'CSmartPtr', 'VectorWS',
-		'CUtlLeanVectorFixedGrowable', 'CUtlLeanVector', 'CUtlVectorFixedGrowable', 'EventClientOutput_t', 'CUtlDict', 'BASEPTR', 'ENTITYFUNCPTR', 'USEPTR'
-		'ENetworkDisconnectionReason', 'CBitVec', 'CTypedBitVec', 'Flags_t', 'CPhysSurfacePropertiesVehicle', 'EntityEffects_t', 'CEntityKeyValues'
-		'ItemFlagTypes_t', 'DamageTypes_t', 'ObserverMode_t', 'EntityDissolveType_t', 'Class_T', 'InputBitMask_t'
+		'CUtlLeanVectorFixedGrowable', 'CUtlLeanVector', 'CUtlVectorFixedGrowable', 'EventClientOutput_t', 'CUtlDict', 'BASEPTR', 'ENTITYFUNCPTR', 'USEPTR',
+		'ENetworkDisconnectionReason', 'CBitVec', 'CTypedBitVec', 'Flags_t', 'CPhysSurfacePropertiesVehicle', 'EntityEffects_t', 'CEntityKeyValues',
+		'ItemFlagTypes_t', 'DamageTypes_t', 'ObserverMode_t', 'EntityDissolveType_t', 'Class_T', 'InputBitMask_t', 'EntityIOQueuePrioritizedEvent_t'
 	]
 
 def get_std_common_types():
-	return [ 'std::pair', 'std::function', 'std::shared_mutex' ]
+	return [ 'std::pair', 'std::function', 'std::shared_mutex', 'std::unique_ptr' ]
 
 def locate_input_path(input_path):
 	if not os.path.exists(input_path):
