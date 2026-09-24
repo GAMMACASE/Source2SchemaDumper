@@ -563,7 +563,11 @@ void SchemaReader::ReadFlags( KeyValues3 *root, CSchemaType *type )
 			{ SCHEMA_CF1_INFO_TAG_MDisableDataDescValidation, "MDisableDataDescValidation" },
 			{ SCHEMA_CF1_INFO_TAG_MClassHasEntityLimitedDataDesc, "MClassHasEntityLimitedDataDesc" },
 			{ SCHEMA_CF1_INFO_TAG_MClassHasCustomAlignedNewDelete, "MClassHasCustomAlignedNewDelete" },
+#if SOURCE_ENGINE == SE_CS2
+			{ SCHEMA_CF1_INFO_TAG_MNonConstructibleClassBase, "MNonConstructibleClassBase" },
+#else
 			{ SCHEMA_CF1_UNK016, "unk016" },
+#endif
 			{ SCHEMA_CF1_INFO_TAG_MConstructibleClassBase, "MConstructibleClassBase" },
 			{ SCHEMA_CF1_INFO_TAG_MHasKV3TransferPolymorphicClassname, "MHasKV3TransferPolymorphicClassname" }
 		};
@@ -580,7 +584,7 @@ void SchemaReader::ReadFlags( KeyValues3 *root, CSchemaType *type )
 		char buf[64];
 		for(int i = 0; i < sizeof( class_flags ) * 8; i++)
 		{
-			if((class_flags & i) != 0)
+			if((class_flags & (1 << i)) != 0)
 			{
 				std::snprintf( buf, sizeof( buf ), "UNKNOWN_BIT_%d", i );
 				flags->ArrayAddElementToTail()->SetString( buf );
@@ -606,7 +610,12 @@ void SchemaReader::ReadFlags( KeyValues3 *root, CSchemaType *type )
 		static std::pair<uint32, const char *> s_FlagMap[] = {
 			{ SCHEMA_EF_IS_REGISTERED, "is_registered" },
 			{ SCHEMA_EF_MODULE_LOCAL_TYPE_SCOPE, "local_type_scope" },
-			{ SCHEMA_EF_GLOBAL_TYPE_SCOPE, "global_type_scope" }
+			{ SCHEMA_EF_GLOBAL_TYPE_SCOPE, "global_type_scope" },
+#if SOURCE_ENGINE == SE_CS2
+			{ SCHEMA_EF_UNK003, "unk003" },
+			{ SCHEMA_EF_UNK004, "unk004" },
+			{ SCHEMA_EF_UNK005, "unk005" }
+#endif
 		};
 
 		for(int i = 0; i < ARRAYSIZE( s_FlagMap ); i++)
@@ -621,7 +630,7 @@ void SchemaReader::ReadFlags( KeyValues3 *root, CSchemaType *type )
 		char buf[64];
 		for(int i = 0; i < sizeof( enum_flags ) * 8; i++)
 		{
-			if((enum_flags & i) != 0)
+			if((enum_flags & (1 << i)) != 0)
 			{
 				std::snprintf( buf, sizeof( buf ), "UNKNOWN_BIT_%d", i );
 				flags->ArrayAddElementToTail()->SetString( buf );
