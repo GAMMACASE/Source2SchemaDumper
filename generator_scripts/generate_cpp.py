@@ -529,6 +529,7 @@ def main():
 		# For std::pair usage
 		writer.write_il('#include <utility>')
 		writer.write_il('#include <memory>')
+		writer.write_il('#include <optional>')
 
 		if args.static_assert:
 			writer.write_il('#include "stddef.h"')

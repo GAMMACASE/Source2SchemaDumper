@@ -563,7 +563,7 @@ void SchemaReader::ReadFlags( KeyValues3 *root, CSchemaType *type )
 			{ SCHEMA_CF1_INFO_TAG_MDisableDataDescValidation, "MDisableDataDescValidation" },
 			{ SCHEMA_CF1_INFO_TAG_MClassHasEntityLimitedDataDesc, "MClassHasEntityLimitedDataDesc" },
 			{ SCHEMA_CF1_INFO_TAG_MClassHasCustomAlignedNewDelete, "MClassHasCustomAlignedNewDelete" },
-#if SOURCE_ENGINE == SE_CS2
+#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DEADLOCK
 			{ SCHEMA_CF1_INFO_TAG_MNonConstructibleClassBase, "MNonConstructibleClassBase" },
 #else
 			{ SCHEMA_CF1_UNK016, "unk016" },
@@ -611,7 +611,7 @@ void SchemaReader::ReadFlags( KeyValues3 *root, CSchemaType *type )
 			{ SCHEMA_EF_IS_REGISTERED, "is_registered" },
 			{ SCHEMA_EF_MODULE_LOCAL_TYPE_SCOPE, "local_type_scope" },
 			{ SCHEMA_EF_GLOBAL_TYPE_SCOPE, "global_type_scope" },
-#if SOURCE_ENGINE == SE_CS2
+#if SOURCE_ENGINE == SE_CS2 || SOURCE_ENGINE == SE_DEADLOCK
 			{ SCHEMA_EF_UNK003, "unk003" },
 			{ SCHEMA_EF_UNK004, "unk004" },
 			{ SCHEMA_EF_UNK005, "unk005" }
