@@ -67,21 +67,21 @@ jobs:
       - name: Checkout hl2sdk-cs2
         uses: actions/checkout@v4
         with:
-          repository: alliedmodders/hl2sdk
+          repository: alliedmodders/s2sdk
           path: hl2sdk-cs2
           ref: cs2
 
       - name: Checkout hl2sdk-dota
         uses: actions/checkout@v4
         with:
-          repository: alliedmodders/hl2sdk
+          repository: alliedmodders/s2sdk
           path: hl2sdk-dota
           ref: dota
 
       - name: Checkout hl2sdk-deadlock
         uses: actions/checkout@v4
         with:
-          repository: alliedmodders/hl2sdk
+          repository: alliedmodders/s2sdk
           path: hl2sdk-deadlock
           ref: deadlock
 
